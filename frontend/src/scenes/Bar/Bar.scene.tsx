@@ -15,9 +15,9 @@ import * as React from "react";
 import { Link } from "react-router-dom";
 
 const pages = [
+  { title: "Home", link: "/" },
   { title: "About", link: "/about" },
   { title: "Dashboard", link: "/dashboard" },
-  { title: "Home", link: "/" },
 ];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
