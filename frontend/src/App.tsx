@@ -1,6 +1,7 @@
 import { Container, Typography } from "@mui/material";
 import { Link, Outlet, Route, Routes } from "react-router-dom";
 import Bar from "./scenes/Bar/Bar.scene";
+import Home from "./scenes/Home/Home.scene";
 
 const App = () => {
   return (
@@ -35,14 +36,6 @@ function Layout() {
           so you can think about this <Outlet> as a placeholder for
           the child routes we defined above. */}
       <Outlet />
-    </div>
-  );
-}
-
-function Home() {
-  return (
-    <div>
-      <Typography variant="h2">Home</Typography>
     </div>
   );
 }
