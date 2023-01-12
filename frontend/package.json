@@ -19,6 +19,7 @@
     "dexie": "^3.2.2",
     "dexie-react-hooks": "^1.1.1",
     "nostr-react": "^0.6.1",
+    "nostr-tools": "^1.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.1",
