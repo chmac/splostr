@@ -1,3 +1,4 @@
+import { NostrProvider } from "nostr-react";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
@@ -18,9 +19,11 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <NostrProvider relayUrls={[]} debug={true}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </NostrProvider>
     </Provider>
   </React.StrictMode>
 );
