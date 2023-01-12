@@ -1,18 +1,18 @@
-import * as React from "react";
-import { Routes, Route, Outlet, Link } from "react-router-dom";
+import { Container, Typography } from "@mui/material";
+import { Link, Outlet, Route, Routes } from "react-router-dom";
 
 export default function App() {
   return (
-    <div>
-      <h1>Basic Example</h1>
+    <Container maxWidth="lg">
+      <Typography variant="h2">Basic Example</Typography>
 
-      <p>
+      <Typography>
         This example demonstrates some of the core features of React Router
         including nested <code>&lt;Route&gt;</code>s,{" "}
         <code>&lt;Outlet&gt;</code>s, <code>&lt;Link&gt;</code>s, and using a
         "*" route (aka "splat route") to render a "not found" page when someone
         visits an unrecognized URL.
-      </p>
+      </Typography>
 
       {/* Routes nest inside one another. Nested route paths build upon
             parent route paths, and nested route elements render inside
@@ -29,7 +29,7 @@ export default function App() {
           <Route path="*" element={<NoMatch />} />
         </Route>
       </Routes>
-    </div>
+    </Container>
   );
 }
 
@@ -68,7 +68,7 @@ function Layout() {
 function Home() {
   return (
     <div>
-      <h2>Home</h2>
+      <Typography variant="h2">Home</Typography>
     </div>
   );
 }
@@ -76,7 +76,7 @@ function Home() {
 function About() {
   return (
     <div>
-      <h2>About</h2>
+      <Typography variant="h2">About</Typography>
     </div>
   );
 }
@@ -84,7 +84,7 @@ function About() {
 function Dashboard() {
   return (
     <div>
-      <h2>Dashboard</h2>
+      <Typography variant="h2">Dashboard</Typography>
     </div>
   );
 }
@@ -92,7 +92,7 @@ function Dashboard() {
 function NoMatch() {
   return (
     <div>
-      <h2>Nothing to see here!</h2>
+      <Typography variant="h2">Nothing to see here!</Typography>
       <p>
         <Link to="/">Go to the home page</Link>
       </p>
