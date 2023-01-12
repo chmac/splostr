@@ -1,9 +1,24 @@
-import { Button, CircularProgress, Typography } from "@mui/material";
+import { Button, CircularProgress, Paper, Typography } from "@mui/material";
 import { dateToUnix, useNostr, useNostrEvents } from "nostr-react";
-import { Event, generatePrivateKey, getPublicKey } from "nostr-tools";
+import {
+  Event,
+  generatePrivateKey,
+  getPublicKey,
+  relayInit,
+} from "nostr-tools";
 import { useRef } from "react";
-import { EVENT_KIND, PRIVATE_KEY } from "../../app/constants";
-import { createGroupEvent } from "../../services/nostr/nostr.service";
+import { GROUP_EVENT_KIND, PRIVATE_KEY } from "../../app/constants";
+import {
+  createExpenseEvent,
+  createGroupEvent,
+} from "../../services/nostr/nostr.service";
+import { Expenses } from "../Expenses/Expenses.scene";
+
+const relay = relayInit("");
+const sub = relay.sub([]);
+sub.on("event", (e: Required<Event>) => {
+  // do something
+});
 
 const Home = () => {
   const now = useRef(new Date());
@@ -11,7 +26,7 @@ const Home = () => {
   const result = useNostrEvents({
     filter: {
       // since: dateToUnix(now.current),
-      kinds: [EVENT_KIND],
+      kinds: [GROUP_EVENT_KIND],
       // until: dateToUnix(now.current),
       // limit: 5,
       // authors: [getPublicKey(PRIVATE_KEY)],
@@ -21,12 +36,12 @@ const Home = () => {
   return (
     <div>
       <Typography variant="h2">Home</Typography>
-      <ul>
+      <div>
         {result.isLoading ? (
           <CircularProgress />
         ) : (
-          result.events.map((event) => (
-            <li key={event.id}>
+          (result.events as Required<Event>[]).map((event) => (
+            <Paper key={event.id}>
               {event.id}
               <br />
               {event.kind} by {event.pubkey}
@@ -86,10 +101,30 @@ const Home = () => {
               >
                 Add person to group
               </Button>
-            </li>
+              <Button
+                onClick={() => {
+                  const amount = globalThis.prompt("How much did you spend?");
+                  if (amount === null) {
+                    globalThis.alert(
+                      "ERROR #yufoSR - You must enter an amount."
+                    );
+                    return;
+                  }
+                  const expenseEvent = createExpenseEvent(
+                    event,
+                    amount,
+                    PRIVATE_KEY
+                  );
+                  nostr.publish(expenseEvent);
+                }}
+              >
+                Add an expense
+              </Button>
+              <Expenses groupId={event.id} />
+            </Paper>
           ))
         )}
-      </ul>
+      </div>
       <Button
         variant="contained"
         onClick={() => {
