@@ -36,6 +36,11 @@ const Home = () => {
   return (
     <div>
       <Typography variant="h2">Home</Typography>
+      <div style={{ marginTop: 20, marginBottom: 20 }}>
+        <Paper>
+          <Typography>{getPublicKey(PRIVATE_KEY)}</Typography>
+        </Paper>
+      </div>
       <div>
         {result.isLoading ? (
           <CircularProgress />
