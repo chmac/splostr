@@ -2,7 +2,7 @@ import { Button, CircularProgress, Typography } from "@mui/material";
 import { dateToUnix, useNostr, useNostrEvents } from "nostr-react";
 import { Event, generatePrivateKey, getPublicKey } from "nostr-tools";
 import { useRef } from "react";
-import { PRIVATE_KEY } from "../../app/constants";
+import { EVENT_KIND, PRIVATE_KEY } from "../../app/constants";
 import { createGroupEvent } from "../../services/nostr/nostr.service";
 
 const Home = () => {
@@ -11,10 +11,10 @@ const Home = () => {
   const result = useNostrEvents({
     filter: {
       // since: dateToUnix(now.current),
-      // kinds: [0],
+      kinds: [EVENT_KIND],
       // until: dateToUnix(now.current),
       // limit: 5,
-      authors: [getPublicKey(PRIVATE_KEY)],
+      // authors: [getPublicKey(PRIVATE_KEY)],
     },
   });
 
@@ -27,11 +27,34 @@ const Home = () => {
         ) : (
           result.events.map((event) => (
             <li key={event.id}>
+              {event.id}
+              <br />
               {event.kind} by {event.pubkey}
               <br />
               {event.content}
               <br />
               {JSON.stringify(event.tags)}
+              <br />
+              <Button
+                onClick={() => {
+                  const dTag = event.tags.find(([tag]) => tag === "d");
+                  if (typeof dTag === "undefined") {
+                    globalThis.alert(
+                      "ERROR #slICE8 - This event does not have a d tag"
+                    );
+                    return;
+                  }
+                  const [, hash] = dTag;
+                  const name = globalThis.prompt("Enter new name");
+                  if (name === null || name.length === 0) {
+                    return;
+                  }
+                  const newEvent = createGroupEvent(name, PRIVATE_KEY, hash);
+                  nostr.publish(newEvent);
+                }}
+              >
+                Update event
+              </Button>
             </li>
           ))
         )}

@@ -1,13 +1,26 @@
 import { dateToUnix } from "nostr-react";
-import { Event, getEventHash, getPublicKey, signEvent } from "nostr-tools";
+import {
+  Event,
+  generatePrivateKey,
+  getEventHash,
+  getPublicKey,
+  signEvent,
+} from "nostr-tools";
+import { EVENT_KIND } from "../../app/constants";
 
-export const createGroupEvent = (name: string, privateKey: string) => {
+export const createGroupEvent = (
+  name: string,
+  privateKey: string,
+  hash?: string
+) => {
+  const groupHash = typeof hash === "string" ? hash : generatePrivateKey();
+
   const event: Event = {
-    kind: 1,
+    kind: EVENT_KIND,
     pubkey: getPublicKey(privateKey),
     content: name,
     created_at: dateToUnix(new Date()),
-    tags: [],
+    tags: [["d", groupHash]],
   };
 
   event.id = getEventHash(event);
