@@ -55,6 +55,37 @@ const Home = () => {
               >
                 Update event
               </Button>
+              <Button
+                onClick={() => {
+                  const dTag = event.tags.find(([tag]) => tag === "d");
+                  if (typeof dTag === "undefined") {
+                    globalThis.alert(
+                      "ERROR #slICE8 - This event does not have a d tag"
+                    );
+                    return;
+                  }
+                  const [, hash] = dTag;
+                  const pubKeys = event.tags
+                    .filter(([tag]) => tag === "p")
+                    .map(([, key]) => key);
+                  const newKey = globalThis.prompt(
+                    "Enter a new public key to add them to the group"
+                  );
+                  if (newKey === null || newKey.length !== 64) {
+                    globalThis.alert("ERROR #L1iWW7 - Invalid public key.");
+                    return;
+                  }
+                  const newEvent = createGroupEvent(
+                    event.content,
+                    PRIVATE_KEY,
+                    hash,
+                    pubKeys.concat(newKey)
+                  );
+                  nostr.publish(newEvent);
+                }}
+              >
+                Add person to group
+              </Button>
             </li>
           ))
         )}
