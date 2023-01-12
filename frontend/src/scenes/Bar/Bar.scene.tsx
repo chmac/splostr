@@ -14,7 +14,11 @@ import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { Link } from "react-router-dom";
 
-const pages = ["About", "Dashboard", "Home"];
+const pages = [
+  { title: "About", link: "/about" },
+  { title: "Dashboard", link: "/dashboard" },
+  { title: "Home", link: "/" },
+];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 export const Bar = () => {
@@ -92,14 +96,14 @@ export const Bar = () => {
                 display: { xs: "block", md: "none" },
               }}
             >
-              {pages.map((page) => (
+              {pages.map(({ title, link }) => (
                 <MenuItem
-                  key={page}
+                  key={title}
                   onClick={handleCloseNavMenu}
-                  to={`/${page}`}
+                  to={link}
                   component={Link}
                 >
-                  <Typography textAlign="center">{page}</Typography>
+                  <Typography textAlign="center">{title}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -124,15 +128,15 @@ export const Bar = () => {
             LOGO
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
+            {pages.map(({ title, link }) => (
               <Button
-                key={page}
+                key={title}
                 component={Link}
-                to={`/${page}`}
+                to={link}
                 // onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
-                {page}
+                {title}
               </Button>
             ))}
           </Box>
