@@ -1,9 +1,16 @@
 import { Typography } from "@mui/material";
 import { useNostrEvents } from "nostr-react";
 
-export const Expenses = ({ groupId }: { groupId: string }) => {
+export const Expenses = ({
+  groupId,
+  members,
+}: {
+  groupId: string;
+  members: string[];
+}) => {
   const result = useNostrEvents({
     filter: {
+      authors: members,
       "#e": [groupId],
     },
   });

@@ -125,7 +125,12 @@ const Home = () => {
               >
                 Add an expense
               </Button>
-              <Expenses groupId={event.id} />
+              <Expenses
+                groupId={event.id}
+                members={event.tags
+                  .filter(([name]) => name === "p")
+                  .map(([, val]) => val)}
+              />
             </Paper>
           ))
         )}
