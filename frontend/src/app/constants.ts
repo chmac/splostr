@@ -1,8 +1,12 @@
 import { generatePrivateKey } from "nostr-tools";
 
 export const NOSTR_RELAY_URLS = [
-  "wss://nostr-pub.wellorder.net",
-  "wss://relay.nostr.ch",
+  // Doesn't support nip33
+  // "wss://nostr-pub.wellorder.net",
+  // Doesn't support nip33
+  // "wss://relay.nostr.ch",
+  "wss://relay.nostr.info",
+  "wss://relay.nostr.nu",
 ];
 
 export const EVENT_KIND = 32910;
