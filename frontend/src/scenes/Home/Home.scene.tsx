@@ -11,6 +11,7 @@ import { GROUP_EVENT_KIND, PRIVATE_KEY } from "../../app/constants";
 import {
   createExpenseEvent,
   createGroupEvent,
+  getDTag,
 } from "../../services/nostr/nostr.service";
 import { Expenses } from "../Expenses/Expenses.scene";
 
@@ -125,12 +126,14 @@ const Home = () => {
               >
                 Add an expense
               </Button>
-              <Expenses
-                groupId={event.id}
-                members={event.tags
-                  .filter(([name]) => name === "p")
-                  .map(([, val]) => val)}
-              />
+              {typeof getDTag(event) === "undefined" ? null : (
+                <Expenses
+                  groupId={getDTag(event) as string}
+                  members={event.tags
+                    .filter(([name]) => name === "p")
+                    .map(([, val]) => val)}
+                />
+              )}
             </Paper>
           ))
         )}
