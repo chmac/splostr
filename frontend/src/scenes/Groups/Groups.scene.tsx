@@ -70,7 +70,6 @@ export const Groups = () => {
           Create group
         </Button>
       </div>
-      <Typography>Coming soon...</Typography>
     </div>
   );
 };
