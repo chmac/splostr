@@ -1,7 +1,9 @@
 import { Container, Typography } from "@mui/material";
 import { Link, Outlet, Route, Routes } from "react-router-dom";
 import Bar from "./scenes/Bar/Bar.scene";
-import Home from "./scenes/Home/Home.scene";
+import { Groups } from "./scenes/Groups/Groups.scene";
+import { Home } from "./scenes/Home/Home.scene";
+import { Invites } from "./scenes/Invites/Invites.scene";
 
 const App = () => {
   return (
@@ -12,6 +14,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path="groups" element={<Groups />} />
+          <Route path="invites" element={<Invites />} />
           <Route path="about" element={<About />} />
           <Route path="dashboard" element={<Dashboard />} />
 

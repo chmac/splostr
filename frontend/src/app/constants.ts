@@ -9,8 +9,11 @@ export const NOSTR_RELAY_URLS = [
   "wss://relay.nostr.nu",
 ];
 
-export const GROUP_EVENT_KIND = 32910;
-export const EXPENSE_EVENT_KIND = 2910;
+export const GROUP_CREATE_EVENT_KIND = 1535;
+export const GROUP_METADATA_EVENT_KIND = 31535;
+export const GROUP_INVITE_EVENT_KIND = 1536;
+export const GROUP_INVITE_RESPONSE_EVENT_KIND = 1537;
+export const EXPENSE_EVENT_KIND = 1538;
 
 const storageKeyKey = "__nostrKey";
 
