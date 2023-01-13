@@ -1,5 +1,4 @@
 import { Button, Typography } from "@mui/material";
-import { debug } from "console";
 import { useNostr, useNostrEvents } from "nostr-react";
 import * as R from "remeda";
 import {
