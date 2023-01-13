@@ -1,0 +1,13 @@
+diff --git a/node_modules/nostr-react/dist/core.d.ts b/node_modules/nostr-react/dist/core.d.ts
+index 6afe4e7..f2a275e 100644
+--- a/node_modules/nostr-react/dist/core.d.ts
++++ b/node_modules/nostr-react/dist/core.d.ts
+@@ -23,7 +23,7 @@ export declare function useNostrEvents({ filter, enabled, }: {
+     enabled?: boolean;
+ }): {
+     isLoading: boolean;
+-    events: NostrEvent[];
++    events: Required<NostrEvent>[];
+     onConnect: (_onConnectCallback?: OnConnectFunc | undefined) => void;
+     connectedRelays: Relay[];
+     unsubscribe: () => void | void;
