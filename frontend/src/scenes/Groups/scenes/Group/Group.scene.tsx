@@ -32,6 +32,7 @@ export const Group = ({ id }: { id: string }) => {
     filter: {
       kinds: [GROUP_METADATA_EVENT_KIND],
       authors: [groupAuthorId],
+      "#d": [id],
     },
   });
 
