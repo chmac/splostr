@@ -10,6 +10,7 @@ import {
   createGroupInviteEvent,
   getPubkeyOfEvent,
 } from "../../../../services/nostr/nostr.service";
+import { Expenses } from "../Expenses/Expenses.scene";
 import { Members } from "../Members/Members.scene";
 
 export const Group = ({ id }: { id: string }) => {
@@ -64,6 +65,7 @@ export const Group = ({ id }: { id: string }) => {
           Invite member
         </Button>
       ) : null}
+      <Expenses groupId={id} />
     </Paper>
   );
 };

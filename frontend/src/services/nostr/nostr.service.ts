@@ -23,6 +23,22 @@ export const getDTag = (event: EventFromRelay) => {
   return typeof tag === "undefined" ? tag : tag[1];
 };
 
+export const getEventTagValue = (event: EventFromRelay, key: string) => {
+  const tag = event.tags.find(filterForTag(key));
+  if (typeof tag === "undefined") {
+    return;
+  }
+  return tag[1];
+};
+
+export const getEvent = (event: EventFromRelay) => {
+  const tag = event.tags.find(filterForTag("subject"));
+  if (typeof tag === "undefined") {
+    return "";
+  }
+  return tag[1];
+};
+
 export const getGroupIdFromInviteEvent = (event: EventFromRelay) => {
   const eTags = event.tags.filter(filterForTag("e"));
   const eventIdTag = eTags.find((event) => event[3] === "root");
