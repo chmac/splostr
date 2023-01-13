@@ -43,10 +43,12 @@ export const Group = ({ id }: { id: string }) => {
 
   return (
     <Paper>
-      <Typography>Name: {groupMetadata.name}</Typography>
+      <Typography>{id}</Typography>
+      <Typography variant="h2">{groupMetadata.name}</Typography>
       <Typography>About: {groupMetadata.about}</Typography>
       <Typography>Picture: {groupMetadata.picture}</Typography>
       <Members id={id} ownerPublicKey={groupAuthorId} />
+      <Expenses groupId={id} />
       {groupAuthorId === getPublicKey(PRIVATE_KEY) ? (
         <Button
           onClick={() => {
@@ -66,7 +68,6 @@ export const Group = ({ id }: { id: string }) => {
           Invite member
         </Button>
       ) : null}
-      <Expenses groupId={id} />
     </Paper>
   );
 };
