@@ -6,22 +6,13 @@ import {
   GROUP_METADATA_EVENT_KIND,
   PRIVATE_KEY,
 } from "../../../../app/constants";
-import { EventFromRelay } from "../../../../app/types";
 import {
   createGroupInviteEvent,
-  getGroupIdFromInviteEvent,
   getPubkeyOfEvent,
 } from "../../../../services/nostr/nostr.service";
 import { Members } from "../Members/Members.scene";
 
-export const Group = (
-  props: { groupId: string } | { inviteEvent: EventFromRelay }
-) => {
-  const id =
-    "groupId" in props
-      ? props.groupId
-      : getGroupIdFromInviteEvent(props.inviteEvent);
-
+export const Group = ({ id }: { id: string }) => {
   const nostr = useNostr();
 
   const groupResult = useNostrEvents({

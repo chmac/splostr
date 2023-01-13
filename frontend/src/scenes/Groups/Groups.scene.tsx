@@ -45,7 +45,7 @@ export const Groups = () => {
         <Typography>No existing groups found</Typography>
       ) : null}
       {groupIds.map((id) => (
-        <Group key={id} groupId={id} />
+        <Group key={id} id={id} />
       ))}
 
       <Typography variant="h2">Create a new group</Typography>
