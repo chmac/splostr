@@ -34,13 +34,13 @@ export const useNostrQuery = (filter: Filter) => {
         sub.unsub();
       };
     };
-    const onFinish = execute();
+    const cleanupPromise = execute();
     return () => {
-      const doFinished = async () => {
-        const finished = await onFinish;
+      const doAsyncCleanup = async () => {
+        const finished = await cleanupPromise;
         finished();
       };
-      doFinished();
+      doAsyncCleanup();
     };
   }, [dispatch, filter]);
 
