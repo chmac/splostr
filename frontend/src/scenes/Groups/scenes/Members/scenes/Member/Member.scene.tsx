@@ -1,27 +1,14 @@
 import { Typography } from "@mui/material";
-import { useNostrEvents, useProfile } from "nostr-react";
-import { useState } from "react";
-import * as R from "remeda";
-import {
-  getProfileFromEvent,
-  NostrProfile,
-} from "../../../../../../services/nostr/nostr.service";
+import { useNostrQuery } from "../../../../../../nostr-redux";
+import { getProfileFromEvent } from "../../../../../../services/nostr/nostr.service";
 
 export const Member = ({ id }: { id: string }) => {
-  const [profile, setProfile] = useState<NostrProfile>({});
-  // const useProfileResult = useProfile({ pubkey: id });
-  const profileResult = useNostrEvents({
-    filter: {
-      kinds: [0],
-      authors: [id],
-    },
+  const profileEvents = useNostrQuery({
+    authors: [id],
+    kinds: [0],
   });
 
-  const maybeProfile = getProfileFromEvent(profileResult.events[0]);
-  if (!R.equals(profile, maybeProfile)) {
-    setProfile(maybeProfile);
-  }
-  // console.log("#VbsSsI Member profile", id, profile);
+  const profile = getProfileFromEvent(profileEvents[0]);
 
   return (
     <div>
