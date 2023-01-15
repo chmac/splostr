@@ -6,7 +6,7 @@ export const NOSTR_RELAY_URLS = [
   // Doesn't support nip33
   // "wss://relay.nostr.ch",
   "wss://relay.nostr.info",
-  "wss://relay.nostr.nu",
+  // "wss://relay.nostr.nu",
 ];
 
 export const GROUP_CREATE_EVENT_KIND = 1535;
