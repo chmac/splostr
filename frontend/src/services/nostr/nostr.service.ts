@@ -15,6 +15,12 @@ import {
 } from "../../app/constants";
 import { EventFromRelay } from "../../app/types";
 
+export type NostrProfile = {
+  name?: string;
+  about?: string;
+  picture?: string;
+};
+
 export const filterForTag = (key: string) => (tags: string[]) =>
   tags[0] === key;
 
@@ -55,6 +61,18 @@ export const getPubkeyOfEvent = (event: EventFromRelay) => {
   return maybeDelegator || event.pubkey;
 };
 
+export const getProfileFromEvent = (event?: EventFromRelay) => {
+  if (typeof event === "undefined") {
+    return {};
+  }
+  const profileJson = event.content;
+  try {
+    const profile = JSON.parse(profileJson);
+    return profile;
+  } catch (e) {}
+  return {};
+};
+
 export const getGroupMembers = (event: EventFromRelay) => {
   const pTags = event.tags.filter(filterForTag("p"));
   const pValues = pTags.map(([, val]) => val);
@@ -69,6 +87,24 @@ export const signEventWithPrivateKey = (
   const toSign = { id, ...unsignedEvent };
   const sig = signEvent(toSign, privateKey);
   return { sig, ...toSign };
+};
+
+export const createProfileUpdateEvent = (
+  profile: { name: string; about?: string; picture?: string },
+  privateKey: string
+) => {
+  const profileJson = JSON.stringify(profile);
+  const unsignedEvent: Event = {
+    kind: 0,
+    pubkey: getPublicKey(privateKey),
+    content: profileJson,
+    created_at: dateToUnix(new Date()),
+    tags: [],
+  };
+
+  const event = signEventWithPrivateKey(unsignedEvent, privateKey);
+
+  return event;
 };
 
 export const createGroupCreateEvent = (privateKey: string) => {

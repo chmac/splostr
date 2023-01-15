@@ -9,6 +9,7 @@ import {
   createExpenseEvent,
   getPubkeyOfEvent,
 } from "../../../../services/nostr/nostr.service";
+import { Member } from "./scenes/Member/Member.scene";
 
 export const Members = ({
   id,
@@ -26,20 +27,17 @@ export const Members = ({
     },
   });
 
-  const members = R.uniq(
+  const memberIds = R.uniq(
     membersResult.events.map(getPubkeyOfEvent).concat(ownerPublicKey)
   );
+  // console.log("#1suG1U memberIds", memberIds);
 
   return (
     <div>
       <Typography variant="h3">Members</Typography>
-      <ul>
-        {members.map((memberId) => (
-          <Typography component="li" key={memberId}>
-            {memberId}
-          </Typography>
-        ))}
-      </ul>
+      {memberIds.map((id) => (
+        <Member key={id} id={id} />
+      ))}
       <Button
         onClick={() => {
           const amount = globalThis.prompt("Enter the amount of this expense");
@@ -59,7 +57,7 @@ export const Members = ({
             PRIVATE_KEY,
             id,
             amount,
-            members,
+            memberIds,
             date,
             subject
           );
