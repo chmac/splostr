@@ -2,7 +2,7 @@ import { Button, Paper, Typography } from "@mui/material";
 import { useNostr } from "nostr-react";
 import { getPublicKey } from "nostr-tools";
 import { PRIVATE_KEY } from "../../app/constants";
-import { useNostrQuery } from "../../nostr-redux";
+import { useNostrPublish, useNostrQuery } from "../../nostr-redux";
 import { createProfileUpdateEvent } from "../../services/nostr/nostr.service";
 
 const Testing = () => {
@@ -29,7 +29,7 @@ const Testing = () => {
 };
 
 export const Home = () => {
-  const nostr = useNostr();
+  const { publish, result } = useNostrPublish();
   const profileEvents = useNostrQuery({
     authors: [
       "b1919f284056c3b2d81b35a8664a5cefa9794f43eb9b5c288865674a88d05664",
@@ -72,11 +72,13 @@ export const Home = () => {
               globalThis.prompt("Enter a picture URL (optional)") || "";
             const profile = { name, about, picture };
             const event = createProfileUpdateEvent(profile, PRIVATE_KEY);
-            nostr.publish(event);
+
+            publish(event);
           }}
         >
           Set profile data
         </Button>
+        <Typography>{result}</Typography>
       </div>
     </div>
   );

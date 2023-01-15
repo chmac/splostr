@@ -1,5 +1,5 @@
 import { Filter, relayInit, matchFilter } from "nostr-tools";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import { EventFromRelay } from "../app/types";
@@ -47,4 +47,28 @@ export const useNostrQuery = (filter: Filter) => {
   const result = useSelector(createSelectorFromFilter(filter));
 
   return result;
+};
+
+export const useNostrPublish = () => {
+  const [result, setResult] = useState("");
+
+  return {
+    result,
+    publish: (event: EventFromRelay) => {
+      const execute = async () => {
+        await connected;
+        const pub = relay.publish(event);
+        pub.on("ok", () => {
+          setResult("ok");
+        });
+        pub.on("seen", () => {
+          setResult("seen");
+        });
+        pub.on("failed", () => {
+          setResult("failed");
+        });
+      };
+      execute();
+    },
+  };
 };
