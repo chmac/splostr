@@ -1,6 +1,7 @@
 import { Container, Typography } from "@mui/material";
 import { Link, Outlet, Route, Routes } from "react-router-dom";
 import Bar from "./scenes/Bar/Bar.scene";
+import { Group } from "./scenes/Group/Group.scene";
 import { Groups } from "./scenes/Groups/Groups.scene";
 import { Home } from "./scenes/Home/Home.scene";
 import { Invites } from "./scenes/Invites/Invites.scene";
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="groups" element={<Groups />} />
+          <Route path="groups/:gruoupId" element={<Group />} />
           <Route path="invites" element={<Invites />} />
           <Route path="about" element={<About />} />
           <Route path="dashboard" element={<Dashboard />} />

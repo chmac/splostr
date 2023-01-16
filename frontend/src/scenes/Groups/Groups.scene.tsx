@@ -1,6 +1,7 @@
 import { Button, CircularProgress, Typography } from "@mui/material";
 import { useNostr, useNostrEvents } from "nostr-react";
 import { getPublicKey } from "nostr-tools";
+import { Link } from "react-router-dom";
 import {
   GROUP_CREATE_EVENT_KIND,
   GROUP_INVITE_RESPONSE_EVENT_KIND,
@@ -11,7 +12,6 @@ import {
   createGroupMetadataEvent,
   getGroupIdFromInviteEvent,
 } from "../../services/nostr/nostr.service";
-import { Group } from "./scenes/Group/Group.scene";
 
 export const Groups = () => {
   const nostr = useNostr();
@@ -45,7 +45,11 @@ export const Groups = () => {
         <Typography>No existing groups found</Typography>
       ) : null}
       {groupIds.map((id) => (
-        <Group key={id} id={id} />
+        <p>
+          <Typography component={Link} key={id} to={`/groups/${id}`}>
+            Group link
+          </Typography>
+        </p>
       ))}
 
       <Typography variant="h2">Create a new group</Typography>

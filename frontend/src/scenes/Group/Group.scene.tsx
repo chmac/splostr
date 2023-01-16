@@ -1,19 +1,26 @@
 import { Button, Paper, Typography } from "@mui/material";
 import { useNostr, useNostrEvents } from "nostr-react";
 import { getPublicKey } from "nostr-tools";
+import { useParams } from "react-router-dom";
 import {
   GROUP_CREATE_EVENT_KIND,
   GROUP_METADATA_EVENT_KIND,
   PRIVATE_KEY,
-} from "../../../../app/constants";
+} from "../../app/constants";
 import {
   createGroupInviteEvent,
   getPubkeyOfEvent,
-} from "../../../../services/nostr/nostr.service";
-import { Expenses } from "../Expenses/Expenses.scene";
-import { Members } from "../Members/Members.scene";
+} from "../../services/nostr/nostr.service";
+import { Expenses } from "./scenes/Expenses/Expenses.scene";
+import { Members } from "./scenes/Members/Members.scene";
 
-export const Group = ({ id }: { id: string }) => {
+type Params = {
+  groupId: string;
+};
+
+export const Group = () => {
+  const params = useParams<Params>() as Params;
+  const id = params.groupId;
   const nostr = useNostr();
 
   const groupResult = useNostrEvents({

@@ -3,6 +3,7 @@ import { getPublicKey } from "nostr-tools";
 import { PRIVATE_KEY } from "../../app/constants";
 import { useNostrPublish } from "../../nostr-redux";
 import { createProfileUpdateEvent } from "../../services/nostr/nostr.service";
+import { Groups } from "../Groups/Groups.scene";
 
 export const Home = () => {
   const { publish, result } = useNostrPublish();
@@ -14,6 +15,8 @@ export const Home = () => {
         <Paper>
           <Typography>{getPublicKey(PRIVATE_KEY)}</Typography>
         </Paper>
+
+        <Groups />
 
         <Button
           onClick={() => {
