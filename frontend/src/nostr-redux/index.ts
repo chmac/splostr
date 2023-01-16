@@ -15,8 +15,15 @@ export const createSelectorFromFilter =
     return matchingEvents;
   };
 
-export const useNostrQuery = (filter: Filter) => {
+export const useNostrQuery = ({
+  filter,
+  waitForEose = false,
+}: {
+  filter: Filter;
+  waitForEose?: boolean;
+}) => {
   const dispatch = useDispatch();
+  const [gotEose, setGotEose] = useState(false);
   useEffect(() => {
     const execute = async () => {
       await connected;
@@ -27,6 +34,7 @@ export const useNostrQuery = (filter: Filter) => {
       });
 
       sub.on("eose", () => {
+        setGotEose(true);
         // TODO - Dispatch an action here
       });
 
@@ -44,9 +52,11 @@ export const useNostrQuery = (filter: Filter) => {
     };
   }, [dispatch, filter]);
 
-  const result = useSelector(createSelectorFromFilter(filter));
+  const events = useSelector(createSelectorFromFilter(filter));
 
-  return result;
+  const eventsToReturn = waitForEose && !gotEose ? [] : events;
+
+  return { events: eventsToReturn, gotEose };
 };
 
 export const useNostrPublish = () => {

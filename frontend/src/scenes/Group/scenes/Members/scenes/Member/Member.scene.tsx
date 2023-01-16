@@ -3,9 +3,11 @@ import { useNostrQuery } from "../../../../../../nostr-redux";
 import { getProfileFromEvent } from "../../../../../../services/nostr/nostr.service";
 
 export const Member = ({ id }: { id: string }) => {
-  const profileEvents = useNostrQuery({
-    authors: [id],
-    kinds: [0],
+  const { events: profileEvents } = useNostrQuery({
+    filter: {
+      authors: [id],
+      kinds: [0],
+    },
   });
 
   const profile = getProfileFromEvent(profileEvents[0]);

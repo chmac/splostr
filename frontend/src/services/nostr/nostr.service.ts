@@ -56,6 +56,15 @@ export const getGroupIdFromInviteEvent = (event: EventFromRelay) => {
   return id;
 };
 
+export const getGroupIdFromMetadataEvent = (event: EventFromRelay) => {
+  const id = getDTag(event);
+  if (typeof id === "undefined") {
+    debugger;
+    throw new Error("#zyo3Rl Metadata event does not contain a d tag");
+  }
+  return id;
+};
+
 export const getPubkeyOfEvent = (event: EventFromRelay) => {
   const maybeDelegator = nip26.getDelegator(event);
   return maybeDelegator || event.pubkey;
