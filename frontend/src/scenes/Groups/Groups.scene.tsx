@@ -67,8 +67,7 @@ export const Groups = () => {
 
   return (
     <div>
-      <Typography variant="h2">Existing groups</Typography>
-
+      <Typography variant="h2">Groups</Typography>
       <Typography variant="h3">My groups</Typography>
 
       <List>
@@ -81,7 +80,7 @@ export const Groups = () => {
         ))}
       </List>
 
-      <Typography variant="h2">Create a new group</Typography>
+      <Typography variant="h3">Create a new group</Typography>
       <div>
         <Button
           onClick={() => {

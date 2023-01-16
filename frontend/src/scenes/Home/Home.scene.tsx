@@ -18,6 +18,7 @@ export const Home = () => {
 
         <Groups />
 
+        <Typography variant="h2">Update profile</Typography>
         <Button
           onClick={() => {
             const name = globalThis.prompt("Enter your name");
