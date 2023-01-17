@@ -13,7 +13,7 @@ import {
   GROUP_INVITE_RESPONSE_EVENT_KIND,
   GROUP_METADATA_EVENT_KIND,
 } from "../../app/constants";
-import { EventFromRelay } from "../../app/types";
+import { NostrEvent } from "../../app/types";
 
 export type NostrProfile = {
   name?: string;
@@ -24,12 +24,12 @@ export type NostrProfile = {
 export const filterForTag = (key: string) => (tags: string[]) =>
   tags[0] === key;
 
-export const getDTag = (event: EventFromRelay) => {
+export const getDTag = (event: NostrEvent) => {
   const tag = event.tags.find(filterForTag("d"));
   return typeof tag === "undefined" ? tag : tag[1];
 };
 
-export const getEventTagValue = (event: EventFromRelay, key: string) => {
+export const getEventTagValue = (event: NostrEvent, key: string) => {
   const tag = event.tags.find(filterForTag(key));
   if (typeof tag === "undefined") {
     return;
@@ -37,7 +37,7 @@ export const getEventTagValue = (event: EventFromRelay, key: string) => {
   return tag[1];
 };
 
-export const getEvent = (event: EventFromRelay) => {
+export const getEvent = (event: NostrEvent) => {
   const tag = event.tags.find(filterForTag("subject"));
   if (typeof tag === "undefined") {
     return "";
@@ -45,7 +45,7 @@ export const getEvent = (event: EventFromRelay) => {
   return tag[1];
 };
 
-export const getGroupIdFromInviteEvent = (event: EventFromRelay) => {
+export const getGroupIdFromInviteEvent = (event: NostrEvent) => {
   const eTags = event.tags.filter(filterForTag("e"));
   const eventIdTag = eTags.find((event) => event[3] === "root");
   if (typeof eventIdTag === "undefined") {
@@ -56,7 +56,7 @@ export const getGroupIdFromInviteEvent = (event: EventFromRelay) => {
   return id;
 };
 
-export const getGroupIdFromMetadataEvent = (event: EventFromRelay) => {
+export const getGroupIdFromMetadataEvent = (event: NostrEvent) => {
   const id = getDTag(event);
   if (typeof id === "undefined") {
     debugger;
@@ -65,20 +65,18 @@ export const getGroupIdFromMetadataEvent = (event: EventFromRelay) => {
   return id;
 };
 
-export const getRecipientIdsFromInviteEvent = (
-  event: EventFromRelay
-): string[] => {
+export const getRecipientIdsFromInviteEvent = (event: NostrEvent): string[] => {
   const pTags = event.tags.filter(filterForTag("p"));
   const userIds = pTags.map((tag) => tag[1]);
   return userIds;
 };
 
-export const getPublicKeyOfEvent = (event: EventFromRelay) => {
+export const getPublicKeyOfEvent = (event: NostrEvent) => {
   const maybeDelegator = nip26.getDelegator(event);
   return maybeDelegator || event.pubkey;
 };
 
-export const getProfileFromEvent = (event?: EventFromRelay) => {
+export const getProfileFromEvent = (event?: NostrEvent) => {
   if (typeof event === "undefined") {
     return {};
   }
@@ -90,7 +88,7 @@ export const getProfileFromEvent = (event?: EventFromRelay) => {
   return {};
 };
 
-export const getGroupMembers = (event: EventFromRelay) => {
+export const getGroupMembers = (event: NostrEvent) => {
   const pTags = event.tags.filter(filterForTag("p"));
   const pValues = pTags.map(([, val]) => val);
   return pValues;
@@ -99,7 +97,7 @@ export const getGroupMembers = (event: EventFromRelay) => {
 export const signEventWithPrivateKey = (
   unsignedEvent: Event,
   privateKey: string
-): EventFromRelay => {
+): NostrEvent => {
   const id = getEventHash(unsignedEvent);
   const toSign = { id, ...unsignedEvent };
   const sig = signEvent(toSign, privateKey);
@@ -186,7 +184,7 @@ export const createGroupInviteEvent = (
 export const createGroupInviteAcceptEvent = (
   privateKey: string,
   groupId: string,
-  inviteEvent: EventFromRelay
+  inviteEvent: NostrEvent
 ) => {
   const unsignedEvent: Event = {
     kind: GROUP_INVITE_RESPONSE_EVENT_KIND,

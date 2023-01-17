@@ -1,8 +1,8 @@
 import { createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../app/store";
-import { EventFromRelay } from "../app/types";
+import { NostrEvent } from "../app/types";
 
-const eventsAdapter = createEntityAdapter<EventFromRelay>({
+const eventsAdapter = createEntityAdapter<NostrEvent>({
   selectId: (event) => {
     if (event.kind === 0 || (event.kind >= 1e5 && event.kind < 2e5)) {
       return `${event.kind}.${event.pubkey}`;

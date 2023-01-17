@@ -3,7 +3,7 @@ import {
   GROUP_CREATE_EVENT_KIND,
   GROUP_INVITE_EVENT_KIND,
 } from "../../app/constants";
-import { EventFromRelay } from "../../app/types";
+import { NostrEvent } from "../../app/types";
 import {
   getGroupIdFromInviteEvent,
   getPublicKeyOfEvent,
@@ -29,7 +29,7 @@ export const invitedGroupMetadataFilter = (
 };
 
 export const invitedGroupMetadataFilters = (
-  invites: EventFromRelay[]
+  invites: NostrEvent[]
 ): Filter[] => {
   return invites.flatMap((invite) => {
     const id = getGroupIdFromInviteEvent(invite);

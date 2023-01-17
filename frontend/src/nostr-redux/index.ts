@@ -2,7 +2,7 @@ import { Filter, matchFilter, matchFilters, relayInit } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, store } from "../app/store";
-import { EventFromRelay } from "../app/types";
+import { NostrEvent } from "../app/types";
 import { eventAdded, selectAllEvents } from "./events";
 import { gotEose, subscribed, unsubscribed } from "./subscriptions";
 
@@ -33,8 +33,8 @@ export const useNostrQuery = ({
   filters: Filter[];
   waitForEose?: boolean;
 }): {
-  allMatchingEvents: EventFromRelay[];
-  eventsForFilters: EventFromRelay[][];
+  allMatchingEvents: NostrEvent[];
+  eventsForFilters: NostrEvent[][];
 } => {
   const dispatch = useDispatch();
   const [gotEose, setGotEose] = useState(false);
@@ -43,7 +43,7 @@ export const useNostrQuery = ({
       await connected;
       const sub = relay.sub(filters);
 
-      sub.on("event", (event: EventFromRelay) => {
+      sub.on("event", (event: NostrEvent) => {
         dispatch(eventAdded(event));
       });
 
@@ -82,7 +82,7 @@ export const useNostrPublish = () => {
 
   return {
     result,
-    publish: (event: EventFromRelay) => {
+    publish: (event: NostrEvent) => {
       const execute = async () => {
         await connected;
         const pub = relay.publish(event);
@@ -119,7 +119,7 @@ export const getNostrData = async ({
       store.dispatch(unsubscribed(subscriptionId));
     };
 
-    subscription.on("event", (event: EventFromRelay) => {
+    subscription.on("event", (event: NostrEvent) => {
       store.dispatch(eventAdded(event));
     });
 

@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { matchFilter } from "nostr-tools";
 import { RootState } from "../../app/store";
-import { EventFromRelay } from "../../app/types";
+import { NostrEvent } from "../../app/types";
 import { makeSelectEventById, selectAllEvents } from "../../nostr-redux/events";
 import {
   getProfileFromEvent,
@@ -75,8 +75,8 @@ export const makeSelectGroupMembers = (id: string) =>
       const members: {
         id: string;
         profile: NostrProfile;
-        invite: EventFromRelay;
-        response?: EventFromRelay;
+        invite: NostrEvent;
+        response?: NostrEvent;
       }[] = invites.flatMap((invite) => {
         const ids = getRecipientIdsFromInviteEvent(invite);
 

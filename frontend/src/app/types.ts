@@ -1,3 +1,3 @@
 import { Event } from "nostr-tools";
 
-export type EventFromRelay = Required<Event>;
+export type NostrEvent = Required<Event>;
