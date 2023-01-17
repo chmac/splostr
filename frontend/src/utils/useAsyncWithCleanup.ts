@@ -6,7 +6,7 @@ export const useAsyncWithCleanup = (
 ) => {
   // console.log("#UdaMNf useAsyncWithCleanup()", useEffectDependencies);
   useEffect(() => {
-    console.log("#8FsbF9 useAsyncWithCleanup.useEffect");
+    // console.log("#8FsbF9 useAsyncWithCleanup.useEffect");
     const asyncFunctionPromise = asyncFunction();
     const cleanup = () => {
       asyncFunctionPromise.then((cleanupFunction) => {
