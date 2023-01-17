@@ -22,7 +22,7 @@ export const makeSelectGroupAdminPublicKey =
     const event = makeSelectEventById(id)(state);
     if (typeof event === "undefined") {
       return undefined;
-      throw new Error("#twM4y4 Cannot find event by ID");
+      // throw new Error("#twM4y4 Cannot find event by ID");
     }
     const publicKey = getPublicKeyOfEvent(event);
     return publicKey;

@@ -26,6 +26,7 @@ export const Invites = () => {
                 invite.inviteEvent
               );
               // TODO - Add the publish function
+              console.log("#qgnBmi Invites/accept", acceptEvent);
               // nostr.publish(acceptEvent);
             }}
           >
