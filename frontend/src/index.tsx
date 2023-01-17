@@ -20,11 +20,9 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <NostrProvider relayUrls={NOSTR_RELAY_URLS} debug={true}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </NostrProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </Provider>
   </React.StrictMode>
 );
