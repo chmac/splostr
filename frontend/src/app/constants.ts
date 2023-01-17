@@ -1,4 +1,4 @@
-import { generatePrivateKey } from "nostr-tools";
+import { generatePrivateKey, getPublicKey } from "nostr-tools";
 
 export const NOSTR_RELAY_URLS = [
   // Doesn't support nip33
@@ -20,6 +20,7 @@ const storageKeyKey = "__nostrKey";
 export const PRIVATE_KEY = globalThis.localStorage.getItem(
   storageKeyKey
 ) as string;
+export const PUBLIC_KEY = getPublicKey(PRIVATE_KEY);
 
 if (PRIVATE_KEY === null || PRIVATE_KEY.length !== 64) {
   const key = globalThis.prompt("Enter your private key") as string;

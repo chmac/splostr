@@ -1,9 +1,7 @@
 import { Typography } from "@mui/material";
 import { createSelector } from "@reduxjs/toolkit";
-import { useNostrEvents } from "nostr-react";
 import { matchFilter } from "nostr-tools";
 import { useSelector } from "react-redux";
-import { EXPENSE_EVENT_KIND } from "../../../../app/constants";
 import { selectAllEvents } from "../../../../nostr-redux/events";
 import { getEventTagValue } from "../../../../services/nostr/nostr.service";
 import { groupExpensesFilter } from "../../Group.filters";

@@ -77,28 +77,26 @@ export const makeSelectGroupMembers = (id: string) =>
         profile: NostrProfile;
         invite: EventFromRelay;
         response?: EventFromRelay;
-      }[] = invites
-        .map((invite) => {
-          const ids = getRecipientIdsFromInviteEvent(invite);
+      }[] = invites.flatMap((invite) => {
+        const ids = getRecipientIdsFromInviteEvent(invite);
 
-          const inviteMembers = ids.map((id) => {
-            const inviteFilter = groupInviteResponseFilter(id, [id]);
-            const response = events.find((event) =>
-              matchFilter(inviteFilter, event)
-            );
+        const inviteMembers = ids.map((id) => {
+          const inviteFilter = groupInviteResponseFilter(id, [id]);
+          const response = events.find((event) =>
+            matchFilter(inviteFilter, event)
+          );
 
-            const profileFilter = userProfileFilter(id);
-            const profileEvent = events.find((event) =>
-              matchFilter(profileFilter, event)
-            );
-            const profile = getProfileFromEvent(profileEvent);
+          const profileFilter = userProfileFilter(id);
+          const profileEvent = events.find((event) =>
+            matchFilter(profileFilter, event)
+          );
+          const profile = getProfileFromEvent(profileEvent);
 
-            return { id, profile, invite, response };
-          });
+          return { id, profile, invite, response };
+        });
 
-          return inviteMembers;
-        })
-        .flat();
+        return inviteMembers;
+      });
 
       const profileFilter = userProfileFilter(adminPublicKey);
       const profileEvent = events.find((event) =>

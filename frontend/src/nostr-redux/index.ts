@@ -7,6 +7,7 @@ import { eventAdded, selectAllEvents } from "./events";
 import { gotEose, subscribed, unsubscribed } from "./subscriptions";
 
 const relay = relayInit("wss://relay.nostr.nu");
+// const relay = relayInit("wss://relay.nostr.info");
 const connected = relay.connect();
 
 // NOTE: This is not actually used
