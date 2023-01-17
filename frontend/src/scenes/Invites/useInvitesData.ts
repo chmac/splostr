@@ -20,6 +20,7 @@ export const useInvitesData = (publicKey: string) => {
 
     return () => {
       unsubscribeOne();
+      unsubscribeTwo();
     };
   });
 };
