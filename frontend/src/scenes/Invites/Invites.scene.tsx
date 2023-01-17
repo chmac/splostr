@@ -1,12 +1,24 @@
 import { Button, Paper, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import { PRIVATE_KEY, PUBLIC_KEY } from "../../app/constants";
+import { useNostrData } from "../../nostr-redux/useNostrData";
 import { createGroupInviteAcceptEvent } from "../../services/nostr/nostr.service";
-import { makeSelectInvitesWithData } from "./Invites.selectors";
-import { useInvitesData } from "./useInvitesData";
+import { invitedGroupMetadataFilters, invitesFilter } from "./Invites.filters";
+import {
+  makeSelectInvites,
+  makeSelectInvitesWithData,
+} from "./Invites.selectors";
 
 export const Invites = () => {
-  useInvitesData(PUBLIC_KEY);
+  // useInvitesData(PUBLIC_KEY);
+  useNostrData([
+    () => [invitesFilter(PUBLIC_KEY)],
+    (state) => {
+      const inviteEvents = makeSelectInvites(PUBLIC_KEY)(state);
+
+      return invitedGroupMetadataFilters(inviteEvents);
+    },
+  ]);
 
   const invites = useSelector(makeSelectInvitesWithData(PUBLIC_KEY));
 
