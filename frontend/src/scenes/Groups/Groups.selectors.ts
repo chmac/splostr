@@ -4,6 +4,7 @@ import { GROUP_METADATA_EVENT_KIND } from "../../app/constants";
 import { selectAllEvents } from "../../nostr-redux/events";
 import {
   getGroupIdFromInviteEvent,
+  getGroupIdFromMetadataEvent,
   getProfileFromEvent,
   getPublicKeyOfEvent,
   NostrProfile,
@@ -28,8 +29,9 @@ export const makeGroupsSelector = (publicKey: string) =>
       );
 
       const createdGroups = createdGroupMetadatas.map((event) => {
+        const id = getGroupIdFromMetadataEvent(event);
         const profile = getProfileFromEvent(event);
-        return { id: event.id, creatorPublicKey: publicKey, profile };
+        return { id, creatorPublicKey: publicKey, profile };
       });
 
       const joinedGroupInviteResponses = events.filter((event) =>
