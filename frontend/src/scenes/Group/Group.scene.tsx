@@ -1,18 +1,17 @@
 import { Button, Paper, Typography } from "@mui/material";
-import { useNostr, useNostrEvents } from "nostr-react";
+import { useNostr } from "nostr-react";
 import { getPublicKey } from "nostr-tools";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { PRIVATE_KEY } from "../../app/constants";
+import { createGroupInviteEvent } from "../../services/nostr/nostr.service";
 import {
-  GROUP_CREATE_EVENT_KIND,
-  GROUP_METADATA_EVENT_KIND,
-  PRIVATE_KEY,
-} from "../../app/constants";
-import {
-  createGroupInviteEvent,
-  getPubkeyOfEvent,
-} from "../../services/nostr/nostr.service";
+  makeSelectGroupAdminPublicKey,
+  makeSelectGroupMetadata,
+} from "./Group.selectors";
 import { Expenses } from "./scenes/Expenses/Expenses.scene";
 import { Members } from "./scenes/Members/Members.scene";
+import { useGroupData } from "./useGroupData";
 
 type Params = {
   groupId: string;
@@ -22,31 +21,10 @@ export const Group = () => {
   const params = useParams<Params>() as Params;
   const id = params.groupId;
   const nostr = useNostr();
+  useGroupData({ id });
 
-  const groupResult = useNostrEvents({
-    filter: {
-      kinds: [GROUP_CREATE_EVENT_KIND],
-      ids: [id],
-    },
-  });
-
-  const groupAuthorId =
-    groupResult.events.length > 0
-      ? getPubkeyOfEvent(groupResult.events[0])
-      : "";
-
-  const groupMetadataResult = useNostrEvents({
-    filter: {
-      kinds: [GROUP_METADATA_EVENT_KIND],
-      authors: [groupAuthorId],
-      "#d": [id],
-    },
-  });
-
-  const groupMetadata =
-    typeof groupMetadataResult.events?.[0]?.content === "string"
-      ? JSON.parse(groupMetadataResult.events[0].content)
-      : {};
+  const groupAuthorId = useSelector(makeSelectGroupAdminPublicKey(id));
+  const groupMetadata = useSelector(makeSelectGroupMetadata(id));
 
   return (
     <Paper>
@@ -54,7 +32,7 @@ export const Group = () => {
       <Typography variant="h2">{groupMetadata.name}</Typography>
       <Typography>About: {groupMetadata.about}</Typography>
       <Typography>Picture: {groupMetadata.picture}</Typography>
-      <Members id={id} ownerPublicKey={groupAuthorId} />
+      <Members id={id} />
       <Expenses groupId={id} />
       {groupAuthorId === getPublicKey(PRIVATE_KEY) ? (
         <Button

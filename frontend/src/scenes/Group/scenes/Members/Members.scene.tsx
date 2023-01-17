@@ -1,42 +1,22 @@
 import { Button, Typography } from "@mui/material";
-import { useNostr, useNostrEvents } from "nostr-react";
-import * as R from "remeda";
-import {
-  GROUP_INVITE_RESPONSE_EVENT_KIND,
-  PRIVATE_KEY,
-} from "../../../../app/constants";
-import {
-  createExpenseEvent,
-  getPubkeyOfEvent,
-} from "../../../../services/nostr/nostr.service";
+import { useNostr } from "nostr-react";
+import { useSelector } from "react-redux";
+import { PRIVATE_KEY } from "../../../../app/constants";
+import { createExpenseEvent } from "../../../../services/nostr/nostr.service";
+import { makeSelectGroupMembers } from "../../Group.selectors";
 import { Member } from "./scenes/Member/Member.scene";
 
-export const Members = ({
-  id,
-  ownerPublicKey,
-}: {
-  id: string;
-  ownerPublicKey: string;
-}) => {
+export const Members = ({ id }: { id: string }) => {
   const nostr = useNostr();
+  const members = useSelector(makeSelectGroupMembers(id));
 
-  const membersResult = useNostrEvents({
-    filter: {
-      kinds: [GROUP_INVITE_RESPONSE_EVENT_KIND],
-      "#e": [id],
-    },
-  });
-
-  const memberIds = R.uniq(
-    membersResult.events.map(getPubkeyOfEvent).concat(ownerPublicKey)
-  );
-  // console.log("#1suG1U memberIds", memberIds);
+  const memberIds = members.map((member) => member.id);
 
   return (
     <div>
       <Typography variant="h3">Members</Typography>
-      {memberIds.map((id) => (
-        <Member key={id} id={id} />
+      {members.map((member) => (
+        <Member key={member.id} id={member.id} profile={member.profile} />
       ))}
       <Button
         onClick={() => {

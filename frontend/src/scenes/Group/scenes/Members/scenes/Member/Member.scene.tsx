@@ -1,17 +1,13 @@
 import { Typography } from "@mui/material";
-import { useNostrQuery } from "../../../../../../nostr-redux";
-import { getProfileFromEvent } from "../../../../../../services/nostr/nostr.service";
+import { NostrProfile } from "../../../../../../services/nostr/nostr.service";
 
-export const Member = ({ id }: { id: string }) => {
-  const { events: profileEvents } = useNostrQuery({
-    filter: {
-      authors: [id],
-      kinds: [0],
-    },
-  });
-
-  const profile = getProfileFromEvent(profileEvents[0]);
-
+export const Member = ({
+  id,
+  profile,
+}: {
+  id: string;
+  profile: NostrProfile;
+}) => {
   return (
     <div>
       <Typography>

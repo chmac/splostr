@@ -65,7 +65,15 @@ export const getGroupIdFromMetadataEvent = (event: EventFromRelay) => {
   return id;
 };
 
-export const getPubkeyOfEvent = (event: EventFromRelay) => {
+export const getRecipientIdsFromInviteEvent = (
+  event: EventFromRelay
+): string[] => {
+  const pTags = event.tags.filter(filterForTag("p"));
+  const userIds = pTags.map((tag) => tag[1]);
+  return userIds;
+};
+
+export const getPublicKeyOfEvent = (event: EventFromRelay) => {
   const maybeDelegator = nip26.getDelegator(event);
   return maybeDelegator || event.pubkey;
 };

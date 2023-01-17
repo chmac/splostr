@@ -22,7 +22,14 @@ export const eventsSlice = createSlice({
 
 export const { eventAdded } = eventsSlice.actions;
 
-export const { selectAll: selectEvents } =
+export const { selectAll: selectAllEvents, selectById: selectEventByCacheId } =
   eventsAdapter.getSelectors<RootState>(
     (state) => state.nostr[eventsSlice.name]
   );
+
+// NOTE: We need to search all events in the array because we use the
+// `selectId` above to automatically overwrite duplicates.
+export const makeSelectEventById = (id: string) => (state: RootState) => {
+  const events = selectAllEvents(state);
+  return events.find((event) => event.id === id);
+};

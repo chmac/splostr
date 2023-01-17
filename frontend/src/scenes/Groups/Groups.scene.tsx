@@ -1,69 +1,28 @@
 import {
   Button,
-  CircularProgress,
   List,
   ListItem,
   ListItemButton,
   Typography,
 } from "@mui/material";
-import { useNostr, useNostrEvents } from "nostr-react";
+import { useNostr } from "nostr-react";
 import { getPublicKey } from "nostr-tools";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import {
-  GROUP_CREATE_EVENT_KIND,
-  GROUP_INVITE_RESPONSE_EVENT_KIND,
-  GROUP_METADATA_EVENT_KIND,
-  PRIVATE_KEY,
-} from "../../app/constants";
-import { useNostrQuery } from "../../nostr-redux";
+import { PRIVATE_KEY } from "../../app/constants";
 import {
   createGroupCreateEvent,
   createGroupMetadataEvent,
-  getGroupIdFromInviteEvent,
-  getGroupIdFromMetadataEvent,
-  getProfileFromEvent,
 } from "../../services/nostr/nostr.service";
+import { makeGroupsSelector } from "./Groups.selectors";
+import { useGroupsData } from "./useGroupsData";
 
-const useGroups = (publicKey: string) => {
-  const { events: myOwnedGroupMetadataEvents } = useNostrQuery({
-    filter: {
-      kinds: [GROUP_METADATA_EVENT_KIND],
-      authors: [getPublicKey(PRIVATE_KEY)],
-    },
-  });
-  const { events: inviteResponseEvents } = useNostrQuery({
-    filter: {
-      kinds: [GROUP_INVITE_RESPONSE_EVENT_KIND],
-      authors: [getPublicKey(PRIVATE_KEY)],
-    },
-    waitForEose: true,
-  });
-  const acceptedInviteGroupIds = inviteResponseEvents.map(
-    getGroupIdFromInviteEvent
-  );
-  const { events: joinedGroupMetadataEvents } = useNostrQuery({
-    filter: {
-      kinds: [GROUP_METADATA_EVENT_KIND],
-      ids: acceptedInviteGroupIds,
-    },
-  });
-
-  const metadataEvents = myOwnedGroupMetadataEvents.concat(
-    joinedGroupMetadataEvents
-  );
-
-  const groups = metadataEvents.map((event) => {
-    const profile = getProfileFromEvent(event);
-    const id = getGroupIdFromMetadataEvent(event);
-    return { id, profile, event };
-  });
-
-  return groups;
-};
+const publicKey = getPublicKey(PRIVATE_KEY);
 
 export const Groups = () => {
   const nostr = useNostr();
-  const groups = useGroups(getPublicKey(PRIVATE_KEY));
+  useGroupsData(publicKey);
+  const groups = useSelector(makeGroupsSelector(publicKey));
 
   return (
     <div>

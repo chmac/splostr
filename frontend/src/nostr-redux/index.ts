@@ -1,33 +1,46 @@
-import { Filter, relayInit, matchFilter } from "nostr-tools";
+import { Filter, matchFilter, matchFilters, relayInit } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../app/store";
+import { RootState, store } from "../app/store";
 import { EventFromRelay } from "../app/types";
-import { eventAdded, selectEvents } from "./events";
+import { eventAdded, selectAllEvents } from "./events";
+import { gotEose, subscribed, unsubscribed } from "./subscriptions";
 
 const relay = relayInit("wss://relay.nostr.nu");
 const connected = relay.connect();
 
-export const createSelectorFromFilter =
-  (filter: Filter) => (state: RootState) => {
-    const events = selectEvents(state);
-    const matchingEvents = events.filter((event) => matchFilter(filter, event));
-    return matchingEvents;
+// NOTE: This is not actually used
+export const createSelectorFromFilters =
+  (filters: Filter[]) => (state: RootState) => {
+    const events = selectAllEvents(state);
+    const eventsForFilters = filters.map((filter) => {
+      const matchingEvents = events.filter((event) =>
+        matchFilter(filter, event)
+      );
+      return matchingEvents;
+    });
+    const allMatchingEvents = events.filter((event) =>
+      matchFilters(filters, event)
+    );
+    return { allMatchingEvents, eventsForFilters };
   };
 
 export const useNostrQuery = ({
-  filter,
+  filters,
   waitForEose = false,
 }: {
-  filter: Filter;
+  filters: Filter[];
   waitForEose?: boolean;
-}) => {
+}): {
+  allMatchingEvents: EventFromRelay[];
+  eventsForFilters: EventFromRelay[][];
+} => {
   const dispatch = useDispatch();
   const [gotEose, setGotEose] = useState(false);
   useEffect(() => {
     const execute = async () => {
       await connected;
-      const sub = relay.sub([filter]);
+      const sub = relay.sub(filters);
 
       sub.on("event", (event: EventFromRelay) => {
         dispatch(eventAdded(event));
@@ -35,7 +48,6 @@ export const useNostrQuery = ({
 
       sub.on("eose", () => {
         setGotEose(true);
-        // TODO - Dispatch an action here
       });
 
       return () => {
@@ -50,13 +62,18 @@ export const useNostrQuery = ({
       };
       doAsyncCleanup();
     };
-  }, [dispatch, filter]);
+  }, [dispatch, filters]);
 
-  const events = useSelector(createSelectorFromFilter(filter));
+  const selectorResult = useSelector(createSelectorFromFilters(filters));
 
-  const eventsToReturn = waitForEose && !gotEose ? [] : events;
+  const emptyResult = {
+    allMatchingEvents: [],
+    eventsForFilters: filters.map(() => []),
+  };
 
-  return { events: eventsToReturn, gotEose };
+  const toBeReturned = waitForEose && !gotEose ? emptyResult : selectorResult;
+
+  return toBeReturned;
 };
 
 export const useNostrPublish = () => {
@@ -81,4 +98,41 @@ export const useNostrPublish = () => {
       execute();
     },
   };
+};
+
+export const getNostrData = async ({
+  filters,
+  waitForEose = false,
+  subscriptionId = Math.random().toString().slice(2),
+}: {
+  filters: Filter[];
+  waitForEose?: boolean;
+  subscriptionId?: string;
+}): Promise<() => void> => {
+  await connected;
+  return new Promise((resolve, reject) => {
+    const subscription = relay.sub(filters, { id: subscriptionId });
+
+    const unsubscribe = () => {
+      subscription.unsub();
+      store.dispatch(unsubscribed(subscriptionId));
+    };
+
+    subscription.on("event", (event: EventFromRelay) => {
+      store.dispatch(eventAdded(event));
+    });
+
+    subscription.on("eose", () => {
+      store.dispatch(subscribed({ id: subscriptionId, filters }));
+      if (waitForEose) {
+        store.dispatch(gotEose(subscriptionId));
+        resolve(unsubscribe);
+      }
+      // setGotEose(true);
+    });
+
+    if (!waitForEose) {
+      resolve(unsubscribe);
+    }
+  });
 };
