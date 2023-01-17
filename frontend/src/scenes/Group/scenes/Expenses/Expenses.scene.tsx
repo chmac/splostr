@@ -1,26 +1,37 @@
 import { Typography } from "@mui/material";
+import { createSelector } from "@reduxjs/toolkit";
 import { useNostrEvents } from "nostr-react";
+import { matchFilter } from "nostr-tools";
+import { useSelector } from "react-redux";
 import { EXPENSE_EVENT_KIND } from "../../../../app/constants";
+import { selectAllEvents } from "../../../../nostr-redux/events";
 import { getEventTagValue } from "../../../../services/nostr/nostr.service";
+import { groupExpensesFilter } from "../../Group.filters";
+import { makeSelectGroupMembers } from "../../Group.selectors";
+
+export const makeSelectGroupExpenses = (id: string) =>
+  createSelector(
+    selectAllEvents,
+    makeSelectGroupMembers(id),
+    (events, members) => {
+      const membersPublicKeys = members.map((member) => member.id);
+      return events.filter((event) =>
+        matchFilter(groupExpensesFilter(id, membersPublicKeys), event)
+      );
+    }
+  );
 
 export const Expenses = ({ groupId }: { groupId: string }) => {
-  const expensesResult = useNostrEvents({
-    filter: {
-      kinds: [EXPENSE_EVENT_KIND],
-      "#e": [groupId],
-      // TODO Get the list of approved members here
-      // authors: []
-    },
-  });
+  const expenses = useSelector(makeSelectGroupExpenses(groupId));
 
   return (
     <div>
       <Typography variant="h3">Expenses</Typography>
-      {expensesResult.events.length === 0 ? (
+      {expenses.length === 0 ? (
         <Typography>No expenses so far</Typography>
       ) : (
         <ul>
-          {expensesResult.events.map((event) => (
+          {expenses.map((event) => (
             <li key={event.id}>
               Amount: {event.content}
               <br />

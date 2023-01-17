@@ -1,13 +1,16 @@
 import { Filter } from "nostr-tools";
 import {
+  EXPENSE_EVENT_KIND,
+  GROUP_CREATE_EVENT_KIND,
   GROUP_INVITE_EVENT_KIND,
   GROUP_INVITE_RESPONSE_EVENT_KIND,
   GROUP_METADATA_EVENT_KIND,
 } from "../../app/constants";
 
-export const byIdFilter = (id: string): Filter => {
+export const groupCreateByIdFilter = (id: string): Filter => {
   return {
     ids: [id],
+    kinds: [GROUP_CREATE_EVENT_KIND],
   };
 };
 
@@ -49,12 +52,22 @@ export const groupInviteFilter = (
 
 export const groupInviteResponseFilter = (
   id: string,
-  adminPublicKey: string,
   groupMemberPublicKeys: string[]
 ): Filter => {
   return {
     "#e": [id],
     kinds: [GROUP_INVITE_RESPONSE_EVENT_KIND],
+    authors: groupMemberPublicKeys,
+  };
+};
+
+export const groupExpensesFilter = (
+  id: string,
+  groupMemberPublicKeys: string[]
+): Filter => {
+  return {
+    "#e": [id],
+    kinds: [EXPENSE_EVENT_KIND],
     authors: groupMemberPublicKeys,
   };
 };

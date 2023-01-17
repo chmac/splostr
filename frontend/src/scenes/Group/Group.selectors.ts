@@ -64,6 +64,7 @@ export const makeSelectGroupMembers = (id: string) =>
     makeSelectGroupAdminPublicKey(id),
     (events, adminPublicKey) => {
       if (typeof adminPublicKey === "undefined") {
+        console.log("#lNj1ic makeSelectGroupMembers returning EMPTY");
         return [];
       }
       const groupMemberFilter = groupInviteFilter(id, adminPublicKey);
@@ -81,9 +82,7 @@ export const makeSelectGroupMembers = (id: string) =>
           const ids = getRecipientIdsFromInviteEvent(invite);
 
           const inviteMembers = ids.map((id) => {
-            const inviteFilter = groupInviteResponseFilter(id, adminPublicKey, [
-              id,
-            ]);
+            const inviteFilter = groupInviteResponseFilter(id, [id]);
             const response = events.find((event) =>
               matchFilter(inviteFilter, event)
             );

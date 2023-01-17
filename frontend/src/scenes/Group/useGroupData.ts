@@ -2,7 +2,8 @@ import { store } from "../../app/store";
 import { getNostrData } from "../../nostr-redux";
 import { useAsyncWithCleanup } from "../../utils/useAsyncWithCleanup";
 import {
-  byIdFilter,
+  groupCreateByIdFilter,
+  groupExpensesFilter,
   groupInviteFilter,
   groupInviteResponseFilter,
   groupMetadataFilter,
@@ -16,7 +17,7 @@ import {
 export const useGroupData = ({ id }: { id: string }) => {
   useAsyncWithCleanup(async () => {
     const unsubscribeOne = await getNostrData({
-      filters: [byIdFilter(id)],
+      filters: [groupCreateByIdFilter(id)],
       waitForEose: true,
     });
 
@@ -42,7 +43,8 @@ export const useGroupData = ({ id }: { id: string }) => {
 
     const unsubscribeThree = await getNostrData({
       filters: [
-        groupInviteResponseFilter(id, adminPublicKey, groupMemberPublicKeys),
+        groupInviteResponseFilter(id, groupMemberPublicKeys),
+        groupExpensesFilter(id, groupMemberPublicKeys),
         userProfilesFilter(groupMemberPublicKeys),
       ],
       waitForEose: true,
