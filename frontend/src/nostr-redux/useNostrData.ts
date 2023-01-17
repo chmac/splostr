@@ -13,8 +13,6 @@ export const useNostrData = (filterCreators: FilterCreator[]) => {
     >(async (previousValue, filterCreator) => {
       const result = await previousValue;
 
-      // We could apply the filters from the last `filterCreator()` and then
-      // feed the output into the next step...
       const filters = filterCreator(store.getState());
 
       const unsubscribe = await getNostrData({
