@@ -11,7 +11,7 @@ export const Member = ({
   return (
     <div>
       <Typography>
-        {id}
+        <span style={{ wordBreak: "break-all" }}>{id}</span>
         <br />
         Name: {profile.name}
         <br />

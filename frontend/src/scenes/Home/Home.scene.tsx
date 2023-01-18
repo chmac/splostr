@@ -13,7 +13,9 @@ export const Home = () => {
       <Typography variant="h2">Home</Typography>
       <div style={{ marginTop: 20, marginBottom: 20 }}>
         <Paper>
-          <Typography>{getPublicKey(PRIVATE_KEY)}</Typography>
+          <Typography style={{ wordBreak: "break-all" }}>
+            {getPublicKey(PRIVATE_KEY)}
+          </Typography>
         </Paper>
 
         <Groups />

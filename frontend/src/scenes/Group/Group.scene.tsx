@@ -28,7 +28,7 @@ export const Group = () => {
 
   return (
     <Paper>
-      <Typography>{id}</Typography>
+      <Typography style={{ wordBreak: "break-all" }}>{id}</Typography>
       <Typography variant="h2">{groupMetadata.name}</Typography>
       <Typography>About: {groupMetadata.about}</Typography>
       <Typography>Picture: {groupMetadata.picture}</Typography>
