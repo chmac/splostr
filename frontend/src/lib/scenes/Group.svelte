@@ -19,14 +19,30 @@
     });
 </script>
 
-<h1>Group</h1>
-<p>Group id is {params.id}</p>
 {#if state === "loading"}
   <p>Loading</p>
 {:else if state === "error"}
   <p>ERROR: #QDuySq Failed to load data</p>
   <p>{error}</p>
 {:else if state === "loaded"}
-  <p>Group data coming atcha...</p>
-  <pre>{JSON.stringify(groupData, null, 2)}</pre>
+  <h2>{groupData.profile.name}</h2>
+  <p>{groupData.profile.about}</p>
+  <h3>Members</h3>
+  <ul>
+    {#each Object.entries(groupData.members) as [id, member]}
+      <li>{member.name} (id: {member.id}) for {member.shares} share(s)</li>
+    {/each}
+  </ul>
+  <h3>Expenses</h3>
+  <ul>
+    {#each groupData.expenses as expense}
+      <li>
+        Subject:{expense.subject}<br />Date:{expense.date}<br />Amount: {expense.amount}
+      </li>
+    {/each}
+  </ul>
+  <details>
+    <summary>Full details of the group data</summary>
+    <pre>{JSON.stringify(groupData, null, 2)}</pre>
+  </details>
 {/if}
