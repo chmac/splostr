@@ -1,5 +1,5 @@
 diff --git a/node_modules/nostr-tools/event.ts b/node_modules/nostr-tools/event.ts
-index 8dc35ef..34b20c9 100644
+index 8dc35ef..fea7f20 100644
 --- a/node_modules/nostr-tools/event.ts
 +++ b/node_modules/nostr-tools/event.ts
 @@ -32,8 +32,11 @@ export type EventTemplate = {
@@ -39,3 +39,12 @@ index 8dc35ef..34b20c9 100644
    if (typeof event !== 'object') return false
    if (typeof event.content !== 'string') return false
    if (typeof event.created_at !== 'number') return false
+@@ -93,7 +96,7 @@ export function verifySignature(event: Event & {sig: string}): boolean {
+   )
+ }
+ 
+-export function signEvent(event: Event, key: string): string {
++export function signEvent(event: UnsignedEvent, key: string): string {
+   return secp256k1.utils.bytesToHex(
+     secp256k1.schnorr.signSync(getEventHash(event), key)
+   )
