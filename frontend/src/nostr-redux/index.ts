@@ -1,14 +1,11 @@
-import { Filter, matchFilter, matchFilters, relayInit } from "nostr-tools";
+import { Filter, matchFilter, matchFilters } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, store } from "../app/store";
 import { NostrEvent } from "../app/types";
 import { eventAdded, selectAllEvents } from "./events";
+import { getAllRelayConnections } from "./relays";
 import { gotEose, subscribed, unsubscribed } from "./subscriptions";
-
-const relay = relayInit("wss://relay.nostr.nu");
-// const relay = relayInit("wss://relay.nostr.info");
-const connected = relay.connect();
 
 // NOTE: This is not actually used
 export const createSelectorFromFilters =
@@ -40,26 +37,37 @@ export const useNostrQuery = ({
   const [gotEose, setGotEose] = useState(false);
   useEffect(() => {
     const execute = async () => {
-      await connected;
-      const sub = relay.sub(filters);
+      const relayConnections = getAllRelayConnections();
 
-      sub.on("event", (event: NostrEvent) => {
-        dispatch(eventAdded(event));
-      });
+      const cleanupFunctions = await Promise.all(
+        relayConnections.map((relayConnection) => {
+          const sub = relayConnection.sub(filters);
 
-      sub.on("eose", () => {
-        setGotEose(true);
-      });
+          sub.on("event", (event: NostrEvent) => {
+            dispatch(eventAdded(event));
+          });
 
-      return () => {
-        sub.unsub();
-      };
+          sub.on("eose", () => {
+            setGotEose(true);
+          });
+
+          return () => {
+            sub.unsub();
+          };
+        })
+      );
+
+      return cleanupFunctions;
     };
     const cleanupPromise = execute();
     return () => {
+      // This must be a nested async loop so that we can run it as the cleanup
+      // function inside `useEffect()`
       const doAsyncCleanup = async () => {
-        const finished = await cleanupPromise;
-        finished();
+        const cleanupFunctions = await cleanupPromise;
+        cleanupFunctions.forEach((cleanupFunction) => {
+          cleanupFunction();
+        });
       };
       doAsyncCleanup();
     };
@@ -77,30 +85,6 @@ export const useNostrQuery = ({
   return toBeReturned;
 };
 
-export const useNostrPublish = () => {
-  const [result, setResult] = useState("");
-
-  return {
-    result,
-    publish: (event: NostrEvent) => {
-      const execute = async () => {
-        await connected;
-        const pub = relay.publish(event);
-        pub.on("ok", () => {
-          setResult("ok");
-        });
-        pub.on("seen", () => {
-          setResult("seen");
-        });
-        pub.on("failed", () => {
-          setResult("failed");
-        });
-      };
-      execute();
-    },
-  };
-};
-
 export const getNostrData = async ({
   filters,
   waitForEose = false,
@@ -110,30 +94,56 @@ export const getNostrData = async ({
   waitForEose?: boolean;
   subscriptionId?: string;
 }): Promise<() => void> => {
-  await connected;
   return new Promise((resolve, reject) => {
-    const subscription = relay.sub(filters, { id: subscriptionId });
+    const relayConnections = getAllRelayConnections();
 
-    const unsubscribe = () => {
-      subscription.unsub();
-      store.dispatch(unsubscribed(subscriptionId));
+    // TODO - Check that relays are ready
+
+    const unsubscribeFunctionsPromise = Promise.all<() => void>(
+      relayConnections.map((relayConnection) => {
+        return new Promise((resolve) => {
+          const subscription = relayConnection.sub(filters, {
+            id: subscriptionId,
+          });
+
+          const unsubscribe = () => {
+            subscription.unsub();
+            store.dispatch(unsubscribed(subscriptionId));
+          };
+
+          subscription.on("event", (event: NostrEvent) => {
+            store.dispatch(eventAdded(event));
+          });
+
+          subscription.on("eose", () => {
+            store.dispatch(subscribed({ id: subscriptionId, filters }));
+            if (waitForEose) {
+              store.dispatch(gotEose(subscriptionId));
+              resolve(unsubscribe);
+            }
+          });
+
+          if (!waitForEose) {
+            resolve(unsubscribe);
+          }
+        });
+      })
+    );
+
+    const unsubscribeFromAllRelays = () => {
+      unsubscribeFunctionsPromise.then((unsubscribeFunctions) => {
+        unsubscribeFunctions.forEach((unsubscribeFunction) => {
+          unsubscribeFunction();
+        });
+      });
     };
 
-    subscription.on("event", (event: NostrEvent) => {
-      store.dispatch(eventAdded(event));
-    });
-
-    subscription.on("eose", () => {
-      store.dispatch(subscribed({ id: subscriptionId, filters }));
-      if (waitForEose) {
-        store.dispatch(gotEose(subscriptionId));
-        resolve(unsubscribe);
-      }
-      // setGotEose(true);
-    });
-
-    if (!waitForEose) {
-      resolve(unsubscribe);
+    if (waitForEose) {
+      unsubscribeFunctionsPromise.then(() => {
+        resolve(unsubscribeFromAllRelays);
+      });
+    } else {
+      resolve(unsubscribeFromAllRelays);
     }
   });
 };

@@ -1,12 +1,24 @@
 import { Button, Paper, Typography } from "@mui/material";
 import { getPublicKey } from "nostr-tools";
+import { useState } from "react";
 import { PRIVATE_KEY } from "../../app/constants";
-import { useNostrPublish } from "../../nostr-redux";
+import { useAppSelector } from "../../app/hooks";
+import { publish } from "../../nostr-redux/relays";
 import { createProfileUpdateEvent } from "../../services/nostr/nostr.service";
 import { Groups } from "../Groups/Groups.scene";
 
 export const Home = () => {
-  const { publish, result } = useNostrPublish();
+  const [publishedId, setPublishedId] = useState("");
+  const publishResult = useAppSelector((state) => {
+    if (publishedId === "") {
+      return [];
+    }
+    const relays = state.nostr.relays.relays;
+    const results = Object.entries(relays).map(([, relay]) => {
+      return relay.published[publishedId];
+    });
+    return results;
+  });
 
   return (
     <div>
@@ -35,12 +47,16 @@ export const Home = () => {
             const profile = { name, about, picture };
             const event = createProfileUpdateEvent(profile, PRIVATE_KEY);
 
+            setPublishedId(event.id);
+
             publish(event);
           }}
         >
           Set profile data
         </Button>
-        <Typography>{result}</Typography>
+        <Typography>
+          {publishResult.map((result) => result.status).join(", ")}
+        </Typography>
       </div>
     </div>
   );

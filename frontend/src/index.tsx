@@ -4,6 +4,9 @@ import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import { store } from "./app/store";
 import App from "./App";
+import { startupNostr } from "./nostr-redux/startup";
+import { addRelay } from "./nostr-redux/relays";
+import { NOSTR_RELAY_URLS } from "./app/constants";
 import reportWebVitals from "./reportWebVitals";
 import "./index.css";
 
@@ -14,6 +17,9 @@ import "@fontsource/roboto/700.css";
 
 const container = document.getElementById("root")!;
 const root = createRoot(container);
+
+store.dispatch(addRelay(NOSTR_RELAY_URLS[0]));
+store.dispatch(startupNostr);
 
 root.render(
   <React.StrictMode>

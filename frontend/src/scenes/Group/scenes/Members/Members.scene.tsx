@@ -1,13 +1,12 @@
 import { Button, Typography } from "@mui/material";
-import { useNostr } from "nostr-react";
 import { useSelector } from "react-redux";
 import { PRIVATE_KEY } from "../../../../app/constants";
+import { publish } from "../../../../nostr-redux/relays";
 import { createExpenseEvent } from "../../../../services/nostr/nostr.service";
 import { makeSelectGroupMembers } from "../../Group.selectors";
 import { Member } from "./scenes/Member/Member.scene";
 
 export const Members = ({ id }: { id: string }) => {
-  const nostr = useNostr();
   const members = useSelector(makeSelectGroupMembers(id));
 
   const memberIds = members.map((member) => member.id);
@@ -41,7 +40,7 @@ export const Members = ({ id }: { id: string }) => {
             date,
             subject
           );
-          nostr.publish(event);
+          publish(event);
         }}
       >
         Add expense

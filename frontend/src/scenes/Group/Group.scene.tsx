@@ -1,9 +1,9 @@
 import { Button, Paper, Typography } from "@mui/material";
-import { useNostr } from "nostr-react";
 import { getPublicKey } from "nostr-tools";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { PRIVATE_KEY } from "../../app/constants";
+import { publish } from "../../nostr-redux/relays";
 import { createGroupInviteEvent } from "../../services/nostr/nostr.service";
 import {
   makeSelectGroupAdminPublicKey,
@@ -20,7 +20,6 @@ type Params = {
 export const Group = () => {
   const params = useParams<Params>() as Params;
   const id = params.groupId;
-  const nostr = useNostr();
   useGroupData({ id });
 
   const groupAuthorId = useSelector(makeSelectGroupAdminPublicKey(id));
@@ -47,7 +46,7 @@ export const Group = () => {
               return;
             }
             const event = createGroupInviteEvent(PRIVATE_KEY, id, key);
-            nostr.publish(event);
+            publish(event);
           }}
         >
           Invite member
