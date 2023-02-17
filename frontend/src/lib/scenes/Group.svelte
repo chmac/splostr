@@ -1,6 +1,5 @@
 <script lang="ts">
   import { loadGroupById, type GroupData } from "$lib/services/group.service";
-  import { dataset_dev } from "svelte/internal";
 
   export let params = { id: "" };
   let groupData: GroupData;
