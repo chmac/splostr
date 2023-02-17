@@ -139,6 +139,13 @@
   dependencies:
     "@felte/common" "1.1.4"
 
+"@felte/reporter-svelte@^1.1.5":
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/@felte/reporter-svelte/-/reporter-svelte-1.1.5.tgz#cd03435b20e43be99c3e4b01d9c2ce5637d37727"
+  integrity sha512-emV9eYpN6/JcUP5sDXC3zPFdTnEp4Tw3G7KyT/cSg9MSnhYz+6ZW7eBEGsFSS0dJHocIliZPk+T4ROKdQgFG+w==
+  dependencies:
+    "@felte/common" "1.1.4"
+
 "@felte/validator-zod@^1.0.13":
   version "1.0.13"
   resolved "https://registry.yarnpkg.com/@felte/validator-zod/-/validator-zod-1.0.13.tgz#45422cbbbb295bb1aca3055c3a9f8167038c8868"
