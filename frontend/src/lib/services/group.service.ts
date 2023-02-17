@@ -48,8 +48,11 @@ export type GroupData = {
   expenses: Expense[];
 };
 
-const isExpense = (expense: Expense | any): expense is Expense => {
-  const { type, amount, subject, date } = expense;
+const isExpense = (expense: Expense | unknown): expense is Expense => {
+  if (typeof expense !== "object") {
+    return false;
+  }
+  const { type, amount, subject, date } = expense as Expense;
   if (
     (type !== "share" && type !== "split") ||
     typeof amount === "undefined" ||
@@ -61,16 +64,15 @@ const isExpense = (expense: Expense | any): expense is Expense => {
   return true;
 };
 
-const eventToExpense = (event: Event): Expense => {
+const eventToExpenseOrUndefined = (event: Event): Expense | undefined => {
   const type = getEventTagValue(event, "type");
   const amount = getEventTagValue(event, "amount");
   const subject = getEventTagValue(event, "subject");
   const date = getEventTagValue(event, "date");
   const expense = { type, amount, subject, date, event };
   if (!isExpense(expense)) {
-    const message = "#Ih8yrD Invalid expense event found";
-    console.warn(message, expense);
-    throw new Error(message);
+    console.warn("#Ih8yrD Invalid expense event found", expense);
+    return;
   }
 
   if (type === "share") {
@@ -104,13 +106,9 @@ const membersFromMetadataEvent = (
   return members;
 };
 
-const catchToUndefined =
-  <A, T>(fn: (...args: A[]) => T): ((A) => T | undefined) =>
-  (...args) => {
-    try {
-      return fn(...args);
-    } catch {}
-  };
+const filterOutUndefined = <T>(input: T): input is NonNullable<T> => {
+  return typeof input !== "undefined";
+};
 
 export const loadGroupById = async (relayUrls: string[], groupId: string) => {
   const startTime = Math.floor(Date.now() / 1_000);
@@ -184,8 +182,8 @@ export const loadGroupById = async (relayUrls: string[], groupId: string) => {
       const e = getEventTagValue(event, "e");
       return e === groupId;
     })
-    .map(catchToUndefined(eventToExpense))
-    .filter((expense): expense is Expense => typeof expense !== "undefined");
+    .map(eventToExpenseOrUndefined)
+    .filter(filterOutUndefined);
 
   const data: GroupData = {
     events: {
@@ -210,7 +208,10 @@ export const loadGroupById = async (relayUrls: string[], groupId: string) => {
     // TODO - Add a check to ensure expenses are only from allowed pubkeys
     groupStore.update((currentValue) => {
       const { expenses } = currentValue;
-      const expense = eventToExpense(event);
+      const expense = eventToExpenseOrUndefined(event);
+      if (typeof expense === "undefined") {
+        return currentValue;
+      }
       return { ...currentValue, expenses: expenses.concat(expense) };
     });
   });
