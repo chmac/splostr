@@ -178,7 +178,7 @@ export const loadGroupById = async (relayUrls: string[], groupId: string) => {
   // TODO - Add a check to ensure expenses are only from allowed pubkeys
   const expenses = events
     .filter((event) => {
-      if (event.kind !== GROUP_KIND) {
+      if ((event.kind as number) !== GROUP_KIND) {
         return false;
       }
       const e = getEventTagValue(event, "e");
