@@ -3,9 +3,12 @@
     updateMemberData,
     type GroupData,
   } from "$lib/services/group.service";
+  import { getPublicKeyOfEvent } from "$lib/services/nostr.service";
+  import { configStore } from "$lib/stores/config.store";
   import Button from "@smui/button";
   import List, { Item, PrimaryText, SecondaryText, Text } from "@smui/list";
   import Textfield from "@smui/textfield";
+  import { getPublicKey } from "nostr-tools";
 
   export let groupData: GroupData;
 
@@ -15,7 +18,14 @@
   let editingName = "";
   let editingShares = "";
 
-  const groupId = groupData.events.create.id;
+  let privateKey: string | undefined;
+  $: publicKey =
+    typeof privateKey === "string" ? getPublicKey(privateKey) : undefined;
+  configStore.subscribe((config) => (privateKey = config.privateKey));
+  $: isGroupOwner =
+    typeof groupData?.events?.create !== "undefined"
+      ? getPublicKeyOfEvent(groupData.events.create) === publicKey
+      : false;
 
   const openEditMember = (id?: string) => {
     error = "";
@@ -42,58 +52,62 @@
         </PrimaryText>
         <SecondaryText>
           Shares: {member.shares}
-          <Button
-            variant="outlined"
-            style="height: 1.4rem;"
-            on:click={() => {
-              openEditMember(member.id);
-            }}>Edit</Button
-          >
+          {#if isGroupOwner}
+            <Button
+              variant="outlined"
+              style="height: 1.4rem;"
+              on:click={() => {
+                openEditMember(member.id);
+              }}>Edit</Button
+            >
+          {/if}
         </SecondaryText>
       </Text>
     </Item>
   {/each}
 </List>
 
-<Button on:click={() => openEditMember()}>Add new member</Button>
+{#if isGroupOwner}
+  <Button on:click={() => openEditMember()}>Add new member</Button>
 
-<dialog bind:this={dialog}>
-  <form
-    method="dialog"
-    on:submit|preventDefault={() => {
-      updateMemberData(groupData, {
-        id: editingId,
-        name: editingName,
-        shares: parseInt(editingShares),
-      }).then((result) => {
-        if (result.success) {
-          dialog.close();
-        } else {
-          error = result.message;
-        }
-      });
-    }}
-  >
-    {#if error === ""}
-      <p>
-        <Textfield bind:value={editingName} label="Name" />
-      </p>
-      <p>
-        <Textfield bind:value={editingShares} label="Shares" type="number" />
-      </p>
-      <p class="buttons">
-        <Button on:click={() => dialog.close()}>Cancel</Button>
-        <Button type="save">Save</Button>
-      </p>
-    {:else}
-      <h3>Error</h3>
-      <p>{error}</p>
-      <p class="buttons">
-        <Button on:click={() => dialog.close()}>Close</Button>
-      </p>
-    {/if}
-  </form>
-</dialog>
+  <dialog bind:this={dialog}>
+    <form
+      method="dialog"
+      on:submit|preventDefault={() => {
+        updateMemberData(groupData, {
+          id: editingId,
+          name: editingName,
+          shares: parseInt(editingShares),
+        }).then((result) => {
+          if (result.success) {
+            dialog.close();
+          } else {
+            error = result.message;
+          }
+        });
+      }}
+    >
+      {#if error === ""}
+        <p>
+          <Textfield bind:value={editingName} label="Name" />
+        </p>
+        <p>
+          <Textfield bind:value={editingShares} label="Shares" type="number" />
+        </p>
+        <p class="buttons">
+          <Button on:click={() => dialog.close()}>Cancel</Button>
+          <Button type="save">Save</Button>
+        </p>
+      {:else}
+        <h3>Error</h3>
+        <p>{error}</p>
+        <p class="buttons">
+          <Button on:click={() => dialog.close()}>Close</Button>
+        </p>
+      {/if}
+    </form>
+  </dialog>
+{/if}
 
 <style>
   dialog::backdrop {
