@@ -124,3 +124,9 @@ Any member of a group can post expenses. They are events of kind `1538` like so:
   - Get the group members
   - Choose which members to share the expense with
   - Post an event kind `1537` with the relevant parameters
+
+## Frontend architecture
+
+Currently we're using the `nostr-react` package. Components specify a filter query, and get back an array of events. This creates challenges when trying to retrieve a single event. For example trying to get the group metadata.
+
+When displaying members, currently we're just showing IDs. Ideally we'd retrieve profile (kind `0`) events. There is a `useProfile()` hook in `nostr-react` that would help with this.
