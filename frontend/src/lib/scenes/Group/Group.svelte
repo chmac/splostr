@@ -1,7 +1,7 @@
 <script lang="ts">
   import { loadGroupById, type GroupData } from "$lib/services/group.service";
   import { relayUrls } from "$lib/services/relays.service";
-  import MembersList from "./MembersList.svelte";
+  import MembersList from "./components/MembersList.svelte";
 
   export let params = { id: "" };
   const groupId = params.id;
