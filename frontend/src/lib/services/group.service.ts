@@ -6,7 +6,7 @@ import {
   getProfileFromEvent,
   getPublicKeyOfEvent,
 } from "./nostr.service";
-import { relaysInit } from "./relays.service";
+import { pool, publish, relaysInitPromise, relayUrls } from "./relays.service";
 
 const GROUP_KIND = 1989;
 const METADATA_KIND = 30_000 + GROUP_KIND;
@@ -26,7 +26,7 @@ type Expense = {
   event: Event;
 };
 
-type Member = {
+export type Member = {
   id: string;
   name: string;
   shares: number;
@@ -35,7 +35,7 @@ type Member = {
 export type GroupData = {
   events: {
     create: Event;
-    metadata?: Event;
+    metadata: Event;
   };
   profile: {
     name: string;
@@ -113,7 +113,7 @@ const filterOutUndefined = <T>(input: T): input is NonNullable<T> => {
 export const loadGroupById = async (relayUrls: string[], groupId: string) => {
   const startTime = Math.floor(Date.now() / 1_000);
 
-  const pool = await relaysInit(relayUrls);
+  const pool = await relaysInitPromise;
 
   const events = await pool.list(relayUrls, [
     {
@@ -205,6 +205,7 @@ export const loadGroupById = async (relayUrls: string[], groupId: string) => {
     },
   ]);
   subscription.on("event", (event: Event) => {
+    // TODO - Also handle metadata events here
     // TODO - Add a check to ensure expenses are only from allowed pubkeys
     groupStore.update((currentValue) => {
       const { expenses } = currentValue;
@@ -217,4 +218,35 @@ export const loadGroupById = async (relayUrls: string[], groupId: string) => {
   });
 
   return groupStore;
+};
+
+const generateId = () => Math.random().toString().slice(2, 8);
+
+export const updateMemberData = async (
+  groupData: GroupData,
+  member: Member
+): Promise<{ success: true } | { success: false; message: string }> => {
+  const id = member.id === "" ? generateId() : member.id;
+  const newTag = ["member", id, member.name, member.shares.toString()];
+
+  const oldEvent = groupData.events.metadata;
+
+  const tagsMinusExistingMember = oldEvent.tags.filter(
+    ([tagName, id]) => tagName !== "member" || id !== member.id
+  );
+
+  const newTags = tagsMinusExistingMember.concat([newTag]);
+
+  const { kind, content, pubkey } = oldEvent;
+
+  const newEvent = { kind, content, pubkey, tags: newTags };
+
+  try {
+    await publish(newEvent);
+    return { success: true };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "#KaOF6w Unknown error";
+    return { success: false, message };
+  }
 };

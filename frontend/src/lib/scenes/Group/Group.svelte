@@ -1,12 +1,15 @@
 <script lang="ts">
   import { loadGroupById, type GroupData } from "$lib/services/group.service";
+  import { relayUrls } from "$lib/services/relays.service";
+  import MembersList from "./MembersList.svelte";
 
   export let params = { id: "" };
+  const groupId = params.id;
   let groupData: GroupData;
   let state: "loading" | "loaded" | "error" = "loading";
   let error = "";
 
-  loadGroupById(["wss://nostr-1.afarazit.eu"], params.id)
+  loadGroupById(relayUrls, params.id)
     .then((dataStore) => {
       state = "loaded";
       dataStore.subscribe((data) => {
@@ -26,12 +29,9 @@
 {:else if state === "loaded"}
   <h2>{groupData.profile.name}</h2>
   <p>{groupData.profile.about}</p>
-  <h3>Members</h3>
-  <ul>
-    {#each Object.entries(groupData.members) as [id, member]}
-      <li>{member.name} (id: {member.id}) for {member.shares} share(s)</li>
-    {/each}
-  </ul>
+
+  <MembersList {groupData} />
+
   <h3>Expenses</h3>
   <ul>
     {#each groupData.expenses as expense}
