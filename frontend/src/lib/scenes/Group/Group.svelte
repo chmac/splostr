@@ -1,6 +1,7 @@
 <script lang="ts">
   import { loadGroupById, type GroupData } from "$lib/services/group.service";
   import { relayUrls } from "$lib/services/relays.service";
+  import ExpensesList from "./components/ExpensesList.svelte";
   import MembersList from "./components/MembersList.svelte";
 
   export let params = { id: "" };
@@ -31,15 +32,8 @@
   <p>{groupData.profile.about}</p>
 
   <MembersList {groupData} />
+  <ExpensesList {groupData} />
 
-  <h3>Expenses</h3>
-  <ul>
-    {#each groupData.expenses as expense}
-      <li>
-        Subject:{expense.subject}<br />Date:{expense.date}<br />Amount: {expense.amount}
-      </li>
-    {/each}
-  </ul>
   <details>
     <summary>Full details of the group data</summary>
     <pre>{JSON.stringify(groupData, null, 2)}</pre>
