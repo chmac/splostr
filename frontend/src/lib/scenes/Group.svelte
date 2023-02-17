@@ -17,7 +17,6 @@
     .catch((e) => {
       error = e;
     });
-  console.log("#cvVetc Group.svelte", params);
 </script>
 
 <h1>Group</h1>
