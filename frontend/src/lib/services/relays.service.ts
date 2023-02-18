@@ -8,6 +8,8 @@ import {
   type EventTemplate,
 } from "nostr-tools";
 
+export type PublishEvent = Omit<EventTemplate, "created_at">;
+
 export const relayUrls = ["wss://nostr-1.afarazit.eu"];
 
 export const pool = new SimplePool();
@@ -24,9 +26,7 @@ export const relaysInit = async (relayUrls: string[]) => {
 
 export const relaysInitPromise = relaysInit(relayUrls);
 
-export const publish = (
-  event: Omit<EventTemplate, "created_at">
-): Promise<void> => {
+export const publish = (event: PublishEvent): Promise<void> => {
   return new Promise((resolve, reject) => {
     // TODO - Figure out how to reconnect if necessary here
     try {
