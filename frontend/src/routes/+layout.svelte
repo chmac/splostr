@@ -3,7 +3,6 @@
   import IconButton, { Icon } from "@smui/icon-button";
   import { Svg } from "@smui/common";
   import Menu from "@smui/menu";
-  import { Anchor } from "@smui/menu-surface";
   import List, { Item, Separator, Text } from "@smui/list";
   import { mdiGithub } from "@mdi/js";
 
@@ -44,7 +43,9 @@
   </Row>
 </TopAppBar>
 
-<slot />
+<div class="container">
+  <slot />
+</div>
 
 <style>
   :global(body) {
@@ -53,5 +54,8 @@
   }
   :global(header.mdc-top-app-bar) {
     top: 0;
+  }
+  .container {
+    padding: 1rem;
   }
 </style>
