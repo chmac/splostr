@@ -45,7 +45,9 @@
     ),
   });
 
-  const validateSplits = (form: z.infer<typeof baseSchema>) => {
+  const splitsSumErrorMessage =
+    "#zSPOOf Individual amounts must total to the whole expense amount";
+  const validateSplitsSum = (form: z.infer<typeof baseSchema>) => {
     console.log("#eNQ3cf validateSplits()", form);
     if (form.split === true) {
       const splitsArray = Object.values(form.splits);
@@ -69,14 +71,8 @@
     return true;
   };
 
-  const schema = baseSchema.refine(validateSplits, {
-    message:
-      "#zSPOOf Individual amounts must total to the whole expense amount",
-    // NOTE: We attach the error for `splits` to the `split` field because we
-    // want to show an error for the whole splits if the amounts don't sum
-    // correctly. But we can't do that. As the `split` field is a boolean and a
-    // checkbox, it can't have any validation errors. Yes, this is a dirty hack.
-    path: ["split"],
+  const schema = baseSchema.refine(validateSplitsSum, {
+    message: splitsSumErrorMessage,
   });
 
   const { form, data, errors, setInitialValues } = createForm<
@@ -87,6 +83,16 @@
       console.log("#s8J9f3 felte values", values);
     },
     extend: [validator({ schema }), reporter()],
+    validate: (values) => {
+      if (!validateSplitsSum(values)) {
+        // NOTE: We attach the error for `splits` to the `split` field because
+        // we want to show an error for the whole splits if the amounts don't
+        // sum correctly. But we can't do that. As the `split` field is a
+        // boolean and a checkbox, it can't have any validation errors. Yes,
+        // this is a dirty hack.
+        return { split: [splitsSumErrorMessage] };
+      }
+    },
   });
   $: {
     console.log("#wQU3Vf errors", $errors);
