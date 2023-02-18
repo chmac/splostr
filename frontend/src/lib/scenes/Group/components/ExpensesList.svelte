@@ -1,5 +1,9 @@
 <script lang="ts">
-  import type { GroupData } from "$lib/services/group.service";
+  import {
+    saveGroupExpense,
+    type ExpenseWithOptionalEvent,
+    type GroupData,
+  } from "$lib/services/group.service";
   import { reporter, ValidationMessage } from "@felte/reporter-svelte";
   import { validator } from "@felte/validator-zod";
   import Button from "@smui/button";
@@ -14,6 +18,7 @@
   import { z } from "zod";
 
   export let groupData: GroupData;
+  let formError = "";
 
   const baseSchema = z.object({
     payer: z
@@ -48,7 +53,6 @@
   const splitsSumErrorMessage =
     "#zSPOOf Individual amounts must total to the whole expense amount";
   const validateSplitsSum = (form: z.infer<typeof baseSchema>) => {
-    console.log("#eNQ3cf validateSplits()", form);
     if (form.split === true) {
       const splitsArray = Object.values(form.splits);
 
@@ -75,12 +79,45 @@
     message: splitsSumErrorMessage,
   });
 
-  const { form, data, errors, setInitialValues } = createForm<
+  const { form, data, errors, setInitialValues, reset } = createForm<
     z.infer<typeof schema>
   >({
     onSubmit: (values) => {
-      debugger;
-      console.log("#s8J9f3 felte values", values);
+      const { splits, split, ...rest } = values;
+
+      // Convert the form splits into the expense splits
+      const expenseSplits = split
+        ? Object.fromEntries(
+            Object.entries(splits)
+              // Select only the splits which were selected
+              .filter(([, split]) => split.checked)
+              // Instead of returning an object just get the amount
+              .map(([id, split]) => [id, split.amount])
+          )
+        : undefined;
+
+      // NOTE: We need to explicitly type this here, otherwise `type` will be
+      // considered as a `string` by TypeScript and not as `'split' | 'share'`.
+      const expense: ExpenseWithOptionalEvent = {
+        type: split ? "split" : "share",
+        splits: expenseSplits,
+        ...rest,
+      };
+      saveGroupExpense(groupData, expense)
+        .then((result) => {
+          if (result.success) {
+            reset();
+          } else {
+            formError = result.message;
+          }
+        })
+        .catch((error) => {
+          if (error instanceof Error) {
+            formError = error.message;
+          } else {
+            formError = error;
+          }
+        });
     },
     extend: [validator({ schema }), reporter()],
     validate: (values) => {

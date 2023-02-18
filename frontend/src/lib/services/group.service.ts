@@ -1,4 +1,4 @@
-import type { Event } from "nostr-tools";
+import type { Event, UnsignedEvent } from "nostr-tools";
 import { writable } from "svelte/store";
 import {
   getEventTags,
@@ -6,12 +6,18 @@ import {
   getProfileFromEvent,
   getPublicKeyOfEvent,
 } from "./nostr.service";
-import { pool, publish, relaysInitPromise, relayUrls } from "./relays.service";
+import {
+  pool,
+  publish,
+  relaysInitPromise,
+  relayUrls,
+  type PublishEvent,
+} from "./relays.service";
 
 const GROUP_KIND = 1989;
 const METADATA_KIND = 30_000 + GROUP_KIND;
 
-type Expense = {
+export type ExpenseWithoutEvent = {
   date: string;
   amount: string;
   subject: string;
@@ -23,8 +29,16 @@ type Expense = {
      */
     [memberId: string]: string;
   };
+};
+
+export type ExpenseEvent = {
   event: Event;
 };
+
+export type Expense = ExpenseWithoutEvent & ExpenseEvent;
+
+export type ExpenseWithOptionalEvent = ExpenseWithoutEvent &
+  Partial<ExpenseEvent>;
 
 export type Member = {
   id: string;
@@ -243,6 +257,53 @@ export const updateMemberData = async (
 
   try {
     await publish(newEvent);
+    return { success: true };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "#KaOF6w Unknown error";
+    return { success: false, message };
+  }
+};
+
+const getSplitTags = (expense: ExpenseWithOptionalEvent): string[][] => {
+  if (expense.type === "split") {
+    if (typeof expense.splits === "undefined") {
+      throw new Error("#TiQw7g Split expense without splits");
+    }
+    const splitTags = Object.entries(expense.splits).map(([id, amount]) =>
+      amount === "" ? ["member", id] : ["member", id, amount]
+    );
+    return splitTags;
+  }
+  return [];
+};
+
+export const saveGroupExpense = async (
+  groupData: GroupData,
+  expense: ExpenseWithOptionalEvent
+): Promise<{ success: true } | { success: false; message: string }> => {
+  const isUpdate = typeof expense.event !== "undefined";
+
+  if (isUpdate) {
+    // TODO - Implement expense updates
+    throw new Error("#BDpCLu Updating expenses is not yet implemented");
+  }
+
+  const event: PublishEvent = {
+    kind: GROUP_KIND,
+    content: "",
+    tags: [
+      ["e", groupData.events.create.id, "root"],
+      ["date", expense.date],
+      ["amount", expense.amount],
+      ["subject", expense.subject],
+      ["type", expense.type],
+      ...getSplitTags(expense),
+    ],
+  };
+
+  try {
+    await publish(event);
     return { success: true };
   } catch (error) {
     const message =
