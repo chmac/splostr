@@ -136,9 +136,12 @@
     console.log("#wQU3Vf errors", $errors);
   }
 
+  const today = new Date();
   setInitialValues({
     payer: "",
-    date: "",
+    date: `${today.getFullYear()}-${(today.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${today.getDay().toString().padStart(2, "0")}`,
     subject: "",
     amount: "",
     split: false,
