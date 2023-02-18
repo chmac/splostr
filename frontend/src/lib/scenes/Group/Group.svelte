@@ -39,3 +39,10 @@
     <pre>{JSON.stringify(groupData, null, 2)}</pre>
   </details>
 {/if}
+
+<style>
+  details {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+</style>
