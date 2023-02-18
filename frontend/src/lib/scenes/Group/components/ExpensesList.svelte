@@ -106,6 +106,7 @@
       saveGroupExpense(groupData, expense)
         .then((result) => {
           if (result.success) {
+            dialog.close();
             reset();
           } else {
             formError = result.message;
@@ -265,8 +266,14 @@
     {/if}
 
     <ValidationMessage for="split" let:messages>
-      {messages || ""}
+      {#if messages}
+        <p class="error">{messages}</p>
+      {/if}
     </ValidationMessage>
+
+    {#if formError !== ""}
+      <p class="error">{formError}</p>
+    {/if}
 
     <p class="buttons">
       <Button type="reset" on:click={() => dialog.close()}>Cancel</Button>
@@ -291,5 +298,9 @@
   .amount {
     padding-top: 4px;
     padding-left: 12px;
+  }
+  .error {
+    background-color: #f48fb1;
+    padding: 1rem;
   }
 </style>
