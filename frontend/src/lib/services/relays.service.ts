@@ -1,9 +1,4 @@
-import {
-  configStore,
-  getConfig,
-  getConfigWithPrivateKey,
-  getRelayUrls,
-} from "$lib/stores/config.store";
+import { getConfigWithPrivateKey } from "$lib/stores/config.store";
 import { dateToUnix } from "$lib/utils";
 import {
   getEventHash,
@@ -12,7 +7,6 @@ import {
   SimplePool,
   type EventTemplate,
 } from "nostr-tools";
-import { get } from "svelte/store";
 
 export const relayUrls = ["wss://nostr-1.afarazit.eu"];
 
