@@ -23,17 +23,8 @@ const exampleMembers = {
   d: { id: "d", name: "Diana", shares: 7 },
 };
 
-const exampleShareGroup: GroupData = {
-  events: {
-    create: exampleCreateEvent,
-    metadata: exampleMetadataEvent,
-  },
+const exampleShareGroup = {
   members: exampleMembers,
-  profile: {
-    name: "Test group",
-    about: "Testing splostr on nostr",
-    picture: "",
-  },
   expenses: [exampleShareExpense],
 };
 
@@ -50,17 +41,8 @@ const exampleSplitExpense: Expense = {
   },
 };
 
-const exampleSplitGroup: GroupData = {
-  events: {
-    create: exampleCreateEvent,
-    metadata: exampleMetadataEvent,
-  },
+const exampleSplitGroup = {
   members: exampleMembers,
-  profile: {
-    name: "Test group",
-    about: "Testing splostr on nostr",
-    picture: "",
-  },
   expenses: [exampleSplitExpense],
 };
 

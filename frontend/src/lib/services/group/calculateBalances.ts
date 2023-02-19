@@ -1,7 +1,9 @@
 import { mapValues } from "remeda";
 import type { GroupData } from "./group.service";
 
-export function calculateBalances(groupData: GroupData) {
+export function calculateBalances(
+  groupData: Pick<GroupData, "members" | "expenses">
+) {
   const { members, expenses } = groupData;
 
   const shareCount = Object.entries(members).reduce(
