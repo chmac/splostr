@@ -38,7 +38,7 @@
   <ExpensesList {groupData} />
 
   <details>
-    <summary>Full details of the group data</summary>
+    <summary>Full technical details of the group data</summary>
     <pre>{JSON.stringify(groupData, null, 2)}</pre>
   </details>
 {/if}
