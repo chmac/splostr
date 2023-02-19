@@ -21,7 +21,7 @@
   let formError = "";
 
   const baseSchema = z.object({
-    payer: z
+    payerId: z
       .string()
       .refine(
         (payer) => Object.keys(groupData.members).includes(payer),
@@ -98,11 +98,11 @@
 
       // NOTE: We need to explicitly type this here, otherwise `type` will be
       // considered as a `string` by TypeScript and not as `'split' | 'share'`.
-      const expense: ExpenseWithOptionalEvent = {
+      const expense = {
         type: split ? "split" : "share",
         splits: expenseSplits,
         ...rest,
-      };
+      } as ExpenseWithOptionalEvent;
       saveGroupExpense(groupData, expense)
         .then((result) => {
           if (result.success) {
@@ -135,7 +135,7 @@
 
   const today = new Date();
   setInitialValues({
-    payer: "",
+    payerId: "",
     date: `${today.getFullYear()}-${(today.getMonth() + 1)
       .toString()
       .padStart(2, "0")}-${today.getDay().toString().padStart(2, "0")}`,
@@ -179,10 +179,10 @@
     <h2>Add an expense</h2>
     <p>
       <Select
-        bind:value={$data.payer}
+        bind:value={$data.payerId}
         label="Who paid for this expense?"
         name="payer"
-        invalid={!!$errors.payer}
+        invalid={!!$errors.payerId}
       >
         {#each Object.entries(groupData.members) as [_id, member]}
           <Option value={member.id}>{member.name}</Option>

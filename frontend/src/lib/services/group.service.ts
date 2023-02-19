@@ -1,4 +1,4 @@
-import type { Event, UnsignedEvent } from "nostr-tools";
+import type { Event } from "nostr-tools";
 import { writable } from "svelte/store";
 import {
   getEventTags,
@@ -6,23 +6,25 @@ import {
   getProfileFromEvent,
   getPublicKeyOfEvent,
 } from "./nostr.service";
-import {
-  pool,
-  publish,
-  relaysInitPromise,
-  relayUrls,
-  type PublishEvent,
-} from "./relays.service";
+import { pool, publish, type PublishEvent } from "./relays.service";
 
-const GROUP_KIND = 1989;
-const METADATA_KIND = 30_000 + GROUP_KIND;
+export const GROUP_KIND = 1989;
+export const METADATA_KIND = 30_000 + GROUP_KIND;
 
-export type ExpenseWithoutEvent = {
+type BaseExpense = {
+  payerId: string;
   date: string;
   amount: string;
   subject: string;
-  type: "share" | "split";
-  splits?: {
+};
+
+type ShareExpense = BaseExpense & {
+  type: "share";
+};
+
+type SplitExpense = BaseExpense & {
+  type: "split";
+  splits: {
     /**
      * The split of the amount assigned to this user
      * NOTE: Total splits must sum to the original amount
@@ -30,6 +32,8 @@ export type ExpenseWithoutEvent = {
     [memberId: string]: string;
   };
 };
+
+export type ExpenseWithoutEvent = ShareExpense | SplitExpense;
 
 export type ExpenseEvent = {
   event: Event;
@@ -103,7 +107,7 @@ const eventToExpenseOrUndefined = (event: Event): Expense | undefined => {
     {}
   );
 
-  return { ...expense, splits };
+  return { ...expense, splits } as Expense;
 };
 
 const membersFromMetadataEvent = (
@@ -126,8 +130,6 @@ const filterOutUndefined = <T>(input: T): input is NonNullable<T> => {
 
 export const loadGroupById = async (relayUrls: string[], groupId: string) => {
   const startTime = Math.floor(Date.now() / 1_000);
-
-  const pool = await relaysInitPromise;
 
   const events = await pool.list(relayUrls, [
     {
@@ -310,4 +312,8 @@ export const saveGroupExpense = async (
       error instanceof Error ? error.message : "#KaOF6w Unknown error";
     return { success: false, message };
   }
+};
+
+export const calculateSettlmentPlan = (balances: Record<string, number>) => {
+  // TODO - Calculate settlement from balances
 };
