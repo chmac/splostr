@@ -1,15 +1,18 @@
 import type { Event } from "nostr-tools";
 import { writable } from "svelte/store";
+import { GROUP_KIND, METADATA_KIND } from "../../../constants";
 import {
   getEventTags,
   getEventTagValue,
   getProfileFromEvent,
   getPublicKeyOfEvent,
-} from "./nostr.service";
-import { pool, publish, type PublishEvent } from "./relays.service";
-
-export const GROUP_KIND = 1989;
-export const METADATA_KIND = 30_000 + GROUP_KIND;
+} from "../nostr.service";
+import { pool, publish, type PublishEvent } from "../relays.service";
+import {
+  createEventSchema,
+  expenseEventSchema,
+  metadataEventSchema,
+} from "./events.utils";
 
 type BaseExpense = {
   payerId: string;
@@ -131,7 +134,7 @@ const filterOutUndefined = <T>(input: T): input is NonNullable<T> => {
 export const loadGroupById = async (relayUrls: string[], groupId: string) => {
   const startTime = Math.floor(Date.now() / 1_000);
 
-  const events = await pool.list(relayUrls, [
+  const unfilteredEvents = await pool.list(relayUrls, [
     {
       ids: [groupId],
     },
@@ -145,14 +148,7 @@ export const loadGroupById = async (relayUrls: string[], groupId: string) => {
     },
   ]);
 
-  const eventsById = events.reduce<{ [id: string]: Event }>(
-    (accumulator, event) => {
-      return { ...accumulator, [event.id]: event };
-    },
-    {}
-  );
-
-  const createEvent = eventsById[groupId];
+  const createEvent = unfilteredEvents.find((event) => event.id === groupId);
 
   if (typeof createEvent === "undefined") {
     const message = "#3rkHet Failed to find group creation event";
@@ -162,8 +158,8 @@ export const loadGroupById = async (relayUrls: string[], groupId: string) => {
 
   const groupOwner = getPublicKeyOfEvent(createEvent);
 
-  const metadataEvent = events.find((event) => {
-    if (event.kind !== METADATA_KIND) {
+  const metadataEvent = unfilteredEvents.find((event) => {
+    if ((event.kind as number) !== METADATA_KIND) {
       return false;
     }
     const eventOwner = getPublicKeyOfEvent(event);
@@ -189,8 +185,36 @@ export const loadGroupById = async (relayUrls: string[], groupId: string) => {
 
   const members = membersFromMetadataEvent(metadataEvent);
 
-  // TODO - Add a check to ensure expenses are only from allowed pubkeys
-  const expenses = events
+  const allowedPublicKeys = getEventTags(metadataEvent, "p")
+    .map((tag) => tag[1])
+    .concat(groupOwner);
+
+  const expenseEvents = unfilteredEvents.filter((event) => {
+    if (event.id === createEvent.id || event.id === metadataEvent.id) {
+      return false;
+    }
+
+    if (!expenseEventSchema.safeParse(event).success) {
+      console.warn("#fYJvpe Event failed validation", event);
+      return false;
+    }
+
+    const eventPublicKey = getPublicKeyOfEvent(event);
+    if (!allowedPublicKeys.includes(eventPublicKey)) {
+      console.warn("#j0AI0I Event from wrong public key", event);
+      return false;
+    }
+
+    const eTag = getEventTagValue(event, "e");
+    if (eTag !== groupId) {
+      console.warn("#y2XTm8 Event with wrong e tag", event);
+      return false;
+    }
+
+    return true;
+  });
+
+  const expenses = expenseEvents
     .filter((event) => {
       if ((event.kind as number) !== GROUP_KIND) {
         return false;
@@ -296,9 +320,10 @@ export const saveGroupExpense = async (
     content: "",
     tags: [
       ["e", groupData.events.create.id, "root"],
+      ["payerId", expense.payerId],
       ["date", expense.date],
-      ["amount", expense.amount],
       ["subject", expense.subject],
+      ["amount", expense.amount],
       ["type", expense.type],
       ...getSplitTags(expense),
     ],
