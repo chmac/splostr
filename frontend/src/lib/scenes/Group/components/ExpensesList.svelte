@@ -132,9 +132,6 @@
       }
     },
   });
-  $: {
-    console.log("#wQU3Vf errors", $errors);
-  }
 
   const today = new Date();
   setInitialValues({
