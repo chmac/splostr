@@ -187,8 +187,8 @@
         name="payer"
         invalid={!!$errors.payerId}
       >
-        {#each Object.entries(groupData.members) as [_id, member]}
-          <Option value={member.id}>{member.name}</Option>
+        {#each membersArray as { id, name }}
+          <Option value={id}>{name}</Option>
         {/each}
       </Select>
     </p>
