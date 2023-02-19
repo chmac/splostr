@@ -3,7 +3,7 @@
     saveGroupExpense,
     type ExpenseWithOptionalEvent,
     type GroupData,
-  } from "$lib/services/group.service";
+  } from "$lib/services/group/group.service";
   import { reporter, ValidationMessage } from "@felte/reporter-svelte";
   import { validator } from "@felte/validator-zod";
   import Button from "@smui/button";

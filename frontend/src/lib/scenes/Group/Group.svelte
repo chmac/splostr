@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { loadGroupById, type GroupData } from "$lib/services/group.service";
+  import {
+    loadGroupById,
+    type GroupData,
+  } from "$lib/services/group/group.service";
   import { relayUrls } from "$lib/services/relays.service";
   import ExpensesList from "./components/ExpensesList.svelte";
   import MembersList from "./components/MembersList.svelte";

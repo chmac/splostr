@@ -2,7 +2,7 @@
   import {
     updateMemberData,
     type GroupData,
-  } from "$lib/services/group.service";
+  } from "$lib/services/group/group.service";
   import { getPublicKeyOfEvent } from "$lib/services/nostr.service";
   import { configStore } from "$lib/stores/config.store";
   import Button from "@smui/button";
