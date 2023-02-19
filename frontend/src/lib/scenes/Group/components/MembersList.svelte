@@ -9,6 +9,7 @@
   import List, { Item, PrimaryText, SecondaryText, Text } from "@smui/list";
   import Textfield from "@smui/textfield";
   import { getPublicKey } from "nostr-tools";
+  import { prop, sortBy } from "remeda";
 
   export let groupData: GroupData;
 
@@ -40,11 +41,13 @@
     }
     dialog.showModal();
   };
+
+  const membersArray = sortBy(Object.values(groupData.members), prop("name"));
 </script>
 
 <h3>Members</h3>
 <List twoLine nonInteractive>
-  {#each Object.entries(groupData.members) as [_id, member]}
+  {#each membersArray as member}
     <Item>
       <Text>
         <PrimaryText>

@@ -15,6 +15,7 @@
   import Textfield from "@smui/textfield";
   import HelperText from "@smui/textfield/helper-text";
   import { createForm } from "felte";
+  import { prop, sortBy } from "remeda";
   import { z } from "zod";
 
   export let groupData: GroupData;
@@ -157,6 +158,8 @@
   });
 
   let dialog: HTMLDialogElement;
+
+  const membersArray = sortBy(Object.values(groupData.members), prop("name"));
 </script>
 
 <h3>Expenses</h3>
@@ -245,12 +248,12 @@
     </p>
     {#if $data.split}
       <p>Which members should it be shared with?</p>
-      {#each Object.entries(groupData.members) as [id, member]}
+      {#each membersArray as { name, id }}
         <div class="row">
           <div class="check">
             <FormField>
               <Checkbox bind:checked={$data.splits[id].checked} />
-              <span slot="label">{member.name}</span>
+              <span slot="label">{name}</span>
             </FormField>
           </div>
           <div class="amount">
