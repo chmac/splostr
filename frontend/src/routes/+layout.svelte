@@ -5,6 +5,7 @@
   import Menu from "@smui/menu";
   import List, { Item, Separator, Text } from "@smui/list";
   import { mdiGithub } from "@mdi/js";
+  import Alerts from "$lib/components/Alerts.svelte";
 
   let menu: Menu;
 </script>
@@ -42,6 +43,8 @@
     </Section>
   </Row>
 </TopAppBar>
+
+<Alerts />
 
 <div class="container">
   <slot />
