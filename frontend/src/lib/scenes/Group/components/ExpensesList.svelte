@@ -168,7 +168,10 @@
     <Item>
       <Text>
         <PrimaryText>{expense.subject}</PrimaryText>
-        <SecondaryText>{expense.amount} on {expense.date}</SecondaryText>
+        <SecondaryText>
+          {expense.amount} paid by {expense.payerId} on {expense.date} and shared
+          by {expense.type}
+        </SecondaryText>
         <SecondaryText>{expense.type}</SecondaryText>
       </Text>
     </Item>
