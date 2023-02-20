@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
-import {
-  exampleCreateEvent,
-  exampleExpenseEvent,
-  exampleMetadataEvent,
-} from "../../../fixtures/events.fixtures";
+import { exampleExpenseEvent } from "../../../fixtures/events.fixtures";
 import { calculateBalances } from "./calculateBalances";
-import type { Expense, GroupData } from "./group.service";
+import type { Expense } from "./group.service";
 
 const exampleShareExpense: Expense = {
   amount: "13",
