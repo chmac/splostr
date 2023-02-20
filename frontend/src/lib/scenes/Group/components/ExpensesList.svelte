@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    getMemberNameFromGroupData,
     saveGroupExpense,
     type ExpenseWithOptionalEvent,
     type GroupData,
@@ -169,8 +170,10 @@
       <Text>
         <PrimaryText>{expense.subject}</PrimaryText>
         <SecondaryText>
-          {expense.amount} paid by {expense.payerId} on {expense.date} and shared
-          by {expense.type}
+          {expense.amount} paid by {getMemberNameFromGroupData(
+            groupData,
+            expense.payerId
+          )} on {expense.date} and calculated by {expense.type}
         </SecondaryText>
         <SecondaryText>{expense.type}</SecondaryText>
       </Text>

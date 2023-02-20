@@ -352,3 +352,13 @@ export function getSettlementPlan(groupData: GroupData) {
   const paymentPlan = calculateSettlementPlan(balances);
   return paymentPlan;
 }
+
+export function getMemberNameFromGroupData(groupData: GroupData, id: string) {
+  const name = groupData.members?.[id]?.name;
+  if (typeof name !== "string") {
+    const message = "#OVwu11 Failed to find name for member";
+    console.error(message, id, groupData);
+    throw new Error(message);
+  }
+  return name;
+}

@@ -6,6 +6,7 @@
   import { relayUrls } from "$lib/services/relays.service";
   import ExpensesList from "./components/ExpensesList.svelte";
   import MembersList from "./components/MembersList.svelte";
+  import SettlementPlan from "./components/SettlementPlan.svelte";
 
   export let params = { id: "" };
   const groupId = params.id;
@@ -36,6 +37,7 @@
 
   <MembersList {groupData} />
   <ExpensesList {groupData} />
+  <SettlementPlan {groupData} />
 
   <details>
     <summary>Full technical details of the group data</summary>
