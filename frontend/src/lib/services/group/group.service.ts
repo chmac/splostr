@@ -8,6 +8,8 @@ import {
   getPublicKeyOfEvent,
 } from "../nostr.service";
 import { pool, publish, type PublishEvent } from "../relays.service";
+import { calculateBalances } from "./calculateBalances";
+import { calculateSettlementPlan } from "./calculateSettlmentPlan";
 import {
   createEventSchema,
   expenseEventSchema,
@@ -339,6 +341,8 @@ export const saveGroupExpense = async (
   }
 };
 
-export const calculateSettlmentPlan = (balances: Record<string, number>) => {
-  // TODO - Calculate settlement from balances
+export const getSettlementPlan = (groupData: GroupData) => {
+  const balances = calculateBalances(groupData);
+  const paymentPlan = calculateSettlementPlan(balances);
+  return paymentPlan;
 };
