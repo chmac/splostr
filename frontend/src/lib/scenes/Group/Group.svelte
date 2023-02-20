@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { pushAlert } from "$lib/services/alerts.service";
   import {
     loadGroupById,
     type GroupData,
@@ -11,27 +12,24 @@
   export let params = { id: "" };
   const groupId = params.id;
   let groupData: GroupData;
-  let state: "loading" | "loaded" | "error" = "loading";
-  let error = "";
+  let loading = true;
 
   loadGroupById(relayUrls, params.id)
     .then((dataStore) => {
-      state = "loaded";
+      loading = false;
       dataStore.subscribe((data) => {
         groupData = data;
       });
     })
-    .catch((e) => {
-      error = e;
+    .catch((error) => {
+      console.error("#GgwFFs loadGroupById error", error);
+      pushAlert(error.message, "error", -1);
     });
 </script>
 
-{#if state === "loading"}
+{#if loading}
   <p>Loading</p>
-{:else if state === "error"}
-  <p>ERROR: #QDuySq Failed to load data</p>
-  <p>{error}</p>
-{:else if state === "loaded"}
+{:else}
   <h2>{groupData.profile.name}</h2>
   <p>{groupData.profile.about}</p>
 
