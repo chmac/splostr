@@ -19,7 +19,7 @@ export function calculateSettlementPlan(balances: Record<string, number>) {
     return [];
   }
 
-  // We sort these in order to try and make the output of this reproducible
+  // We sort these in order to try and make the output of this deterministic
   const paymentSenders = sortBy(toPay, first);
   const paymentRecipients = sortBy(toBePaid, first);
 
