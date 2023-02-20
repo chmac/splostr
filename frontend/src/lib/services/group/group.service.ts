@@ -72,7 +72,7 @@ export type GroupData = {
   expenses: Expense[];
 };
 
-const isExpense = (expense: Expense | unknown): expense is Expense => {
+function isExpense(expense: Expense | unknown): expense is Expense {
   if (typeof expense !== "object") {
     return false;
   }
@@ -87,9 +87,9 @@ const isExpense = (expense: Expense | unknown): expense is Expense => {
     return false;
   }
   return true;
-};
+}
 
-const eventToExpenseOrUndefined = (event: Event): Expense | undefined => {
+function eventToExpenseOrUndefined(event: Event): Expense | undefined {
   const payerId = getEventTagValue(event, "payerId");
   const date = getEventTagValue(event, "date");
   const subject = getEventTagValue(event, "subject");
@@ -117,11 +117,11 @@ const eventToExpenseOrUndefined = (event: Event): Expense | undefined => {
   );
 
   return { ...expense, splits } as Expense;
-};
+}
 
-const membersFromMetadataEvent = (
-  event: Event
-): { [memberId: string]: Member } => {
+function membersFromMetadataEvent(event: Event): {
+  [memberId: string]: Member;
+} {
   const memberTags = getEventTags(event, "member");
   const members = memberTags
     .map((tag) => {
@@ -131,14 +131,14 @@ const membersFromMetadataEvent = (
     })
     .reduce((members, member) => ({ ...members, [member.id]: member }), {});
   return members;
-};
+}
 
-const filterOutUndefined = <T>(input: T): input is NonNullable<T> => {
+function filterOutUndefined<T>(input: T): input is NonNullable<T> {
   return typeof input !== "undefined";
-};
+}
 
-export const loadGroupById = async (relayUrls: string[], groupId: string) => {
-  const startTime = Math.floor(Date.now() / 1_000);
+export async function loadGroupById(relayUrls: string[], groupId: string) {
+  const startTime = Math.floor(Date.now() / 1000);
 
   const unfilteredEvents = await pool.list(relayUrls, [
     {
@@ -264,14 +264,16 @@ export const loadGroupById = async (relayUrls: string[], groupId: string) => {
   });
 
   return groupStore;
-};
+}
 
-const generateId = () => Math.random().toString().slice(2, 8);
+function generateId() {
+  return Math.random().toString().slice(2, 8);
+}
 
-export const updateMemberData = async (
+export async function updateMemberData(
   groupData: GroupData,
   member: Member
-): Promise<{ success: true } | { success: false; message: string }> => {
+): Promise<{ success: true } | { success: false; message: string }> {
   const id = member.id === "" ? generateId() : member.id;
   const newTag = ["member", id, member.name, member.shares.toString()];
 
@@ -295,9 +297,9 @@ export const updateMemberData = async (
       error instanceof Error ? error.message : "#KaOF6w Unknown error";
     return { success: false, message };
   }
-};
+}
 
-const getSplitTags = (expense: ExpenseWithOptionalEvent): string[][] => {
+function getSplitTags(expense: ExpenseWithOptionalEvent): string[][] {
   if (expense.type === "split") {
     if (typeof expense.splits === "undefined") {
       throw new Error("#TiQw7g Split expense without splits");
@@ -308,12 +310,12 @@ const getSplitTags = (expense: ExpenseWithOptionalEvent): string[][] => {
     return splitTags;
   }
   return [];
-};
+}
 
-export const saveGroupExpense = async (
+export async function saveGroupExpense(
   groupData: GroupData,
   expense: ExpenseWithOptionalEvent
-): Promise<{ success: true } | { success: false; message: string }> => {
+): Promise<{ success: true } | { success: false; message: string }> {
   const isUpdate = typeof expense.event !== "undefined";
 
   if (isUpdate) {
@@ -343,10 +345,10 @@ export const saveGroupExpense = async (
       error instanceof Error ? error.message : "#KaOF6w Unknown error";
     return { success: false, message };
   }
-};
+}
 
-export const getSettlementPlan = (groupData: GroupData) => {
+export function getSettlementPlan(groupData: GroupData) {
   const balances = calculateBalances(groupData);
   const paymentPlan = calculateSettlementPlan(balances);
   return paymentPlan;
-};
+}

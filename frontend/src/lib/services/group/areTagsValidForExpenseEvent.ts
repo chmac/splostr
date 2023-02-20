@@ -19,9 +19,9 @@ export const tagNameSchema = z.enum(ALLOWED_TAG_NAMES);
 export const dateSchema = z.string().regex(/[0-9]{4}-[0-9]{2}-[0-9{2}]/);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const assertNever = (_x: never): never => {
+function assertNever(_x: never): never {
   throw new Error("#HwVoRC Implementation error");
-};
+}
 
 export function areTagsValidForExpenseEvent(tags: string[][]): boolean {
   const tagNames = tags.map((tag) => tag[0]);

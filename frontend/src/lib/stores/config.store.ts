@@ -31,7 +31,7 @@ export const configStore = persist(
   "__splostrConfig"
 );
 
-export const configSetPrivateKey = (privateKey: string) => {
+export function configSetPrivateKey(privateKey: string) {
   if (privateKey.length !== 64) {
     const message = "#jhpCBI Cannot set invalid private key";
     console.error(message, privateKey);
@@ -41,32 +41,32 @@ export const configSetPrivateKey = (privateKey: string) => {
   configStore.update((config) => {
     return { ...config, privateKey };
   });
-};
+}
 
-export const configHasPrivateKey = () => {
+export function configHasPrivateKey() {
   const config = get(configStore);
   if (typeof config.privateKey === "undefined") {
     return false;
   }
   return true;
-};
+}
 
-export const getConfig = (): Config => {
+export function getConfig(): Config {
   const config = get(configStore);
   const safeConfig = ConfigSchema.parse(config);
   return safeConfig;
-};
+}
 
-export const getConfigWithPrivateKey = (): ConfigWithPrivateKey => {
+export function getConfigWithPrivateKey(): ConfigWithPrivateKey {
   const config = getConfig();
   const safeConfig = ConfigWithPrivateKeySchema.parse(config);
   return safeConfig;
-};
+}
 
-export const getRelayUrls = () => {
+export function getRelayUrls() {
   const { relayUrls } = get(configStore);
   return relayUrls;
-};
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as any).setPrivateKey = configSetPrivateKey;

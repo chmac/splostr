@@ -1,5 +1,5 @@
 import { getConfigWithPrivateKey } from "$lib/stores/config.store";
-import { dateToUnix } from "$lib/utils";
+import dateToUnix from "$lib/utils";
 import {
   getEventHash,
   getPublicKey,
@@ -14,21 +14,7 @@ export const relayUrls = ["wss://nostr-1.afarazit.eu"];
 
 export const pool = new SimplePool();
 
-/*
-export const relaysInit = async (relayUrls: string[]) => {
-  await Promise.all(
-    relayUrls.map(async (relayUrl) => {
-      await pool.ensureRelay(relayUrl);
-    })
-  );
-
-  return pool;
-};
-
-export const relaysInitPromise = relaysInit(relayUrls);
-*/
-
-export const publish = (event: PublishEvent): Promise<void> => {
+export function publish(event: PublishEvent): Promise<void> {
   return new Promise((resolve, reject) => {
     // TODO - Figure out how to reconnect if necessary here
     try {
@@ -63,9 +49,9 @@ export const publish = (event: PublishEvent): Promise<void> => {
 
       setTimeout(() => {
         reject(new Error("#8DknBA Publishing timed out"));
-      }, 3_000);
+      }, 3000);
     } catch (error) {
       reject(error);
     }
   });
-};
+}
