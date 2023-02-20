@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { pushAlert } from "$lib/services/alerts.service";
   import {
     updateMemberData,
     type GroupData,
@@ -13,7 +14,6 @@
 
   export let groupData: GroupData;
 
-  let error = "";
   let dialog: HTMLDialogElement;
   let editingId = "";
   let editingName = "";
@@ -29,7 +29,6 @@
       : false;
 
   const openEditMember = (id?: string) => {
-    error = "";
     if (typeof id === "undefined") {
       editingId = "";
       editingName = "";
@@ -85,29 +84,21 @@
           if (result.success) {
             dialog.close();
           } else {
-            error = result.message;
+            pushAlert(result.message, "error");
           }
         });
       }}
     >
-      {#if error === ""}
-        <p>
-          <Textfield bind:value={editingName} label="Name" />
-        </p>
-        <p>
-          <Textfield bind:value={editingShares} label="Shares" type="number" />
-        </p>
-        <p class="buttons">
-          <Button on:click={() => dialog.close()}>Cancel</Button>
-          <Button type="save">Save</Button>
-        </p>
-      {:else}
-        <h3>Error</h3>
-        <p>{error}</p>
-        <p class="buttons">
-          <Button on:click={() => dialog.close()}>Close</Button>
-        </p>
-      {/if}
+      <p>
+        <Textfield bind:value={editingName} label="Name" />
+      </p>
+      <p>
+        <Textfield bind:value={editingShares} label="Shares" type="number" />
+      </p>
+      <p class="buttons">
+        <Button on:click={() => dialog.close()}>Cancel</Button>
+        <Button type="save">Save</Button>
+      </p>
     </form>
   </dialog>
 {/if}
