@@ -1,5 +1,6 @@
 import type { Event } from "nostr-tools";
 import { writable } from "svelte/store";
+import { z } from "zod";
 import { GROUP_KIND, METADATA_KIND } from "../../../constants";
 import {
   getEventTags,
@@ -8,46 +9,46 @@ import {
   getPublicKeyOfEvent,
 } from "../nostr.service";
 import { pool, publish, type PublishEvent } from "../relays.service";
+import { dateSchema } from "./areTagsValidForExpenseEvent";
 import { calculateBalances } from "./calculateBalances";
-import { calculateSettlementPlan } from "./calculateSettlmentPlan";
-import {
-  createEventSchema,
-  expenseEventSchema,
-  metadataEventSchema,
-} from "./events.utils";
+import { calculateSettlementPlan } from "./calculateSettlementPlan";
+import { expenseEventSchema } from "./events.utils";
 
-type BaseExpense = {
-  payerId: string;
-  date: string;
-  amount: string;
-  subject: string;
-};
+const baseExpenseSchema = z.object({
+  payerId: z.string(),
+  date: dateSchema,
+  amount: z.string(),
+  subject: z.string().min(3),
+});
 
-type ShareExpense = BaseExpense & {
-  type: "share";
-};
+const shareExpenseSchema = baseExpenseSchema.extend({
+  type: z.literal("share"),
+});
 
-type SplitExpense = BaseExpense & {
-  type: "split";
-  splits: {
-    /**
-     * The split of the amount assigned to this user
-     * NOTE: Total splits must sum to the original amount
-     */
-    [memberId: string]: string;
-  };
-};
+const splitExpenseSchema = baseExpenseSchema.extend({
+  type: z.literal("split"),
+  splits: z.record(z.string()),
+});
 
-export type ExpenseWithoutEvent = ShareExpense | SplitExpense;
+const expenseWithoutEventSchema = shareExpenseSchema.or(splitExpenseSchema);
 
-export type ExpenseEvent = {
-  event: Event;
-};
+const expenseSchema = expenseWithoutEventSchema.and(
+  z.object({
+    event: expenseEventSchema,
+  })
+);
 
-export type Expense = ExpenseWithoutEvent & ExpenseEvent;
+const expenseWithOptionalEventSchema = expenseWithoutEventSchema.and(
+  z.object({
+    event: expenseEventSchema.optional(),
+  })
+);
 
-export type ExpenseWithOptionalEvent = ExpenseWithoutEvent &
-  Partial<ExpenseEvent>;
+export type Expense = z.infer<typeof expenseSchema>;
+
+export type ExpenseWithOptionalEvent = z.infer<
+  typeof expenseWithOptionalEventSchema
+>;
 
 export type Member = {
   id: string;
@@ -75,8 +76,9 @@ const isExpense = (expense: Expense | unknown): expense is Expense => {
   if (typeof expense !== "object") {
     return false;
   }
-  const { type, amount, subject, date } = expense as Expense;
+  const { payerId, type, amount, subject, date } = expense as Expense;
   if (
+    typeof payerId === "undefined" ||
     (type !== "share" && type !== "split") ||
     typeof amount === "undefined" ||
     typeof subject === "undefined" ||
@@ -88,11 +90,13 @@ const isExpense = (expense: Expense | unknown): expense is Expense => {
 };
 
 const eventToExpenseOrUndefined = (event: Event): Expense | undefined => {
-  const type = getEventTagValue(event, "type");
-  const amount = getEventTagValue(event, "amount");
-  const subject = getEventTagValue(event, "subject");
+  const payerId = getEventTagValue(event, "payerId");
   const date = getEventTagValue(event, "date");
-  const expense = { type, amount, subject, date, event };
+  const subject = getEventTagValue(event, "subject");
+  const amount = getEventTagValue(event, "amount");
+  const type = getEventTagValue(event, "type");
+  const expense = { payerId, type, amount, subject, date, event };
+
   if (!isExpense(expense)) {
     console.warn("#Ih8yrD Invalid expense event found", expense);
     return;

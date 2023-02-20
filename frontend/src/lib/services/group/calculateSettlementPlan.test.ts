@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateSettlementPlan } from "./calculateSettlmentPlan";
+import { calculateSettlementPlan } from "./calculateSettlementPlan";
 
 describe("#ExJ2j2 calculateSettlmentPlan()", () => {
   it("#2rL7Mb Calculates a payment plan for easy balances", () => {
