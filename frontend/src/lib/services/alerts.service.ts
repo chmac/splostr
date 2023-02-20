@@ -12,13 +12,20 @@ export const alertsStore = writable<Alert[]>([]);
 export function pushAlert(
   message: string,
   type: Alert["type"] = "info",
-  timeoutSeconds = 10
+  timeoutSeconds?: number
 ) {
+  const timeoutWasProvided = typeof timeoutSeconds === "number";
+  const defaultTimeout = type === "error" ? -1 : 6;
+  const calculatedTimeout = timeoutWasProvided
+    ? timeoutSeconds
+    : defaultTimeout;
+
   const incomingAlert = {
     message,
-    timeoutSeconds,
     type,
+    timeoutSeconds: calculatedTimeout,
   };
+
   alertsStore.update((alerts) => {
     return (alerts || []).concat(incomingAlert);
   });

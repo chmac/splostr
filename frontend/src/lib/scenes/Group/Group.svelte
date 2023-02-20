@@ -23,7 +23,7 @@
     })
     .catch((error) => {
       console.error("#GgwFFs loadGroupById error", error);
-      pushAlert(error.message, "error", -1);
+      pushAlert(error.message, "error");
     });
 </script>
 
